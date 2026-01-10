@@ -1,0 +1,9 @@
+site_name: My_blog
+theme:
+  name: material            # 启用 Material 主题
+
+markdown_extensions:
+  - pymdownx.tasklist:      # 开启复选框功能
+      custom_checkbox: true
+  - pymdownx.highlight:     # 开启代码高亮
+  - pymdownx.superfences:   # 让代码块更稳定（解决嵌套问题）
