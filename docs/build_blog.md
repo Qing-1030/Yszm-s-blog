@@ -31,7 +31,6 @@
 
 ```bash
 pip install mkdocs-material
-
 ```
 
 ### 2. 初始化项目
@@ -40,7 +39,6 @@ pip install mkdocs-material
 
 ```bash
 mkdocs new .
-
 ```
 
 ### 3. 配置与发布
@@ -49,7 +47,6 @@ mkdocs new .
 
 ```bash
 mkdocs gh-deploy
-
 ```
 
 就是这么简单！剩下的工作，就是专注于用 Markdown 写作了。
