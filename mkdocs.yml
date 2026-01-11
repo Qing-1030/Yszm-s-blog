@@ -1,4 +1,4 @@
-site_name: My_blog
+site_name: Yszm's blog
 theme:
   name: material            # 启用 Material 主题
 
@@ -7,3 +7,7 @@ markdown_extensions:
       custom_checkbox: true
   - pymdownx.highlight:     # 开启代码高亮
   - pymdownx.superfences:   # 让代码块更稳定（解决嵌套问题）
+
+nav:
+  - 首页: index.md
+  - 博客指南: guide.md
