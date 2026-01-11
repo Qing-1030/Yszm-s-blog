@@ -11,3 +11,4 @@ markdown_extensions:
 nav:
   - 首页: index.md
   - 博客指南: guide.md
+  - 建站心得: build_blog.md
