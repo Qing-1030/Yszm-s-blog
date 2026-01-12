@@ -1,12 +1,41 @@
 site_name: Yszm's blog
 theme:
   name: material            # 启用 Material 主题
+  logo: assets/Logo.png
+  language: zh              # 强制设为中文
+  custom_dir: overrides
+  features:
+    - content.code.copy     # 复制代码按钮
+    - navigation.top        # 返回顶部按钮
+    - navigation.tabs       # 变成顶部导航栏
+  palette:
+    # 方案 1: 日间模式 (点击太阳切换)
+    - scheme: default
+      primary: teal         # 顶部颜色：深青色
+      accent: purple        # 链接/按钮颜色：紫色
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # 方案 2: 夜间模式 (点击月亮切换)
+    - scheme: slate         # "黑夜模式"
+      primary: black        # 顶部变黑
+      accent: lime          # 重点色变成醒目的青柠色
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
 
 markdown_extensions:
   - pymdownx.tasklist:      # 开启复选框功能
       custom_checkbox: true
   - pymdownx.highlight:     # 开启代码高亮
   - pymdownx.superfences:   # 让代码块更稳定（解决嵌套问题）
+  - pymdownx.arithmatex:    # 开启数学公式
+      generic: true
+
+extra_javascript:
+  - javascripts/mathjax.js  # 引入数学公式的js库
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
 
 nav:
   - 首页: index.md
