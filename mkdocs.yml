@@ -37,7 +37,12 @@ extra_javascript:
   - javascripts/mathjax.js  # 引入数学公式的js库
   - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
 
+plugins:
+  - search
+  - encryptcontent
+
 nav:
   - 首页: index.md
   - 博客指南: guide.md
   - 建站心得: build_blog.md
+  - 个人: secret.md
