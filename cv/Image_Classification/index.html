@@ -701,97 +701,162 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch.optim</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">optim</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">random_split</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">torchvision</span><span class="w"> </span><span class="kn">import</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">transforms</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">timm</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">timm.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">resolve_data_config</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
-<span class="c1"># 尝试导入高级评估绘图库，如果没安装则跳过</span>
+<span class="c1"># 尝试导入高级评估库</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">classification_report</span><span class="p">,</span> <span class="n">confusion_matrix</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">seaborn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sns</span>
-
     <span class="n">HAS_SKLEARN</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">HAS_SKLEARN</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[Warning] 未安装 scikit-learn 或 seaborn，将跳过混淆矩阵绘制。建议安装: pip install scikit-learn seaborn&quot;</span><span class="p">)</span>
-
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[Warning] 未安装 sklearn 或 seaborn，跳过混淆矩阵绘制。&quot;</span><span class="p">)</span>
 
 <span class="c1"># ==========================================</span>
-<span class="c1"># 1. 配置区域 [可微调]</span>
+<span class="c1"># 1. 全局配置区域</span>
 <span class="c1"># ==========================================</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Config</span><span class="p">:</span>
-    <span class="c1"># 路径设置</span>
-    <span class="n">data_root</span> <span class="o">=</span> <span class="s2">&quot;flower_data&quot;</span>  <span class="c1"># &lt;--- [可修改] 数据集根目录 (需包含 train/val/test 文件夹)</span>
-    <span class="n">save_dir</span> <span class="o">=</span> <span class="s2">&quot;./results&quot;</span>  <span class="c1"># &lt;--- [可修改] 结果保存路径</span>
+    <span class="c1"># --- 数据集设置 ---</span>
+    <span class="c1"># True = 使用自定义文件夹 (需包含 train/val 文件夹)</span>
+    <span class="c1"># False = 使用 PyTorch 标准内置数据集 (自动下载)</span>
+    <span class="n">USE_CUSTOM_DATASET</span> <span class="o">=</span> <span class="kc">True</span>       <span class="c1"># &lt;--- [可微调] 数据集模式开关</span>
 
-    <span class="c1"># 模型设置</span>
-    <span class="n">model_name</span> <span class="o">=</span> <span class="s2">&quot;resnet50&quot;</span>  <span class="c1"># &lt;--- [可微调] 模型名称 (如 resnet18, efficientnet_b0, mobilenetv3_large_100)</span>
-    <span class="n">num_classes</span> <span class="o">=</span> <span class="mi">5</span>  <span class="c1"># &lt;--- [可修改] 分类类别数</span>
-    <span class="n">pretrained</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># &lt;--- [可微调] 是否使用在线预训练权重</span>
-    <span class="n">checkpoint_path</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>  <span class="c1"># &lt;--- [可微调] 本地权重路径 (仅当 pretrained=False 时使用)</span>
+    <span class="c1"># 模式1：自定义文件夹路径</span>
+    <span class="n">CUSTOM_DATA_ROOT</span> <span class="o">=</span> <span class="s2">&quot;flower_data&quot;</span> <span class="c1"># &lt;--- [可微调] 你的数据集文件夹路径</span>
 
-    <span class="c1"># 训练超参数</span>
-    <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">32</span>  <span class="c1"># &lt;--- [可微调] 批次大小</span>
-    <span class="n">epochs</span> <span class="o">=</span> <span class="mi">20</span>  <span class="c1"># &lt;--- [可微调] 训练轮数</span>
-    <span class="n">lr</span> <span class="o">=</span> <span class="mf">1e-4</span>  <span class="c1"># &lt;--- [可微调] 学习率</span>
-    <span class="n">weight_decay</span> <span class="o">=</span> <span class="mf">1e-4</span>  <span class="c1"># &lt;--- [可微调] 权重衰减 (L2正则化)</span>
+    <span class="c1"># 模式2：内置数据集名称 (如 CIFAR10, CIFAR100, FashionMNIST)</span>
+    <span class="n">BUILTIN_NAME</span> <span class="o">=</span> <span class="s2">&quot;CIFAR10&quot;</span>        <span class="c1"># &lt;--- [可微调] 内置数据集名称</span>
+    <span class="n">DATA_DOWNLOAD_ROOT</span> <span class="o">=</span> <span class="s2">&quot;./data&quot;</span>   <span class="c1"># &lt;--- [可微调] 数据下载路径</span>
 
-    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+    <span class="c1"># --- 结果保存 ---</span>
+    <span class="n">SAVE_DIR</span> <span class="o">=</span> <span class="s2">&quot;./results&quot;</span>          <span class="c1"># &lt;--- [可微调] 训练结果/模型保存路径</span>
 
+    <span class="c1"># --- 模型设置 ---</span>
+    <span class="c1"># 推荐模型: resnet50, resnet18, efficientnet_b0, inception_v3.tf_in1k</span>
+    <span class="n">MODEL_NAME</span> <span class="o">=</span> <span class="s2">&quot;resnet50&quot;</span>         <span class="c1"># &lt;--- [可微调] 使用的模型名称</span>
+
+    <span class="c1"># 本地权重路径设置：</span>
+    <span class="c1"># 1. 填入具体路径 (如 &quot;resnet50.bin&quot;) -&gt; 强制加载本地权重 (pretrained=False)</span>
+    <span class="c1"># 2. 留空 &quot;&quot; -&gt; 自动从网络下载预训练权重 (pretrained=True)</span>
+    <span class="n">CHECKPOINT_PATH</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>            <span class="c1"># &lt;--- [可微调] 本地预训练权重路径</span>
+
+    <span class="c1"># 初始类别数 (代码会自动检测真实类别数并覆盖此值)</span>
+    <span class="n">NUM_CLASSES</span> <span class="o">=</span> <span class="mi">5</span>                 
+
+    <span class="c1"># --- 训练超参数 ---</span>
+    <span class="n">BATCH_SIZE</span> <span class="o">=</span> <span class="mi">32</span>                 <span class="c1"># &lt;--- [可微调] 批次大小 (显存不足可调小)</span>
+    <span class="n">EPOCHS</span> <span class="o">=</span> <span class="mi">20</span>                     <span class="c1"># &lt;--- [可微调] 训练总轮数</span>
+    <span class="n">LR</span> <span class="o">=</span> <span class="mf">1e-4</span>                       <span class="c1"># &lt;--- [可微调] 初始学习率</span>
+    <span class="n">WEIGHT_DECAY</span> <span class="o">=</span> <span class="mf">1e-4</span>             <span class="c1"># &lt;--- [可微调] L2正则化系数</span>
+
+    <span class="n">DEVICE</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
 
 <span class="c1"># ==========================================</span>
-<span class="c1"># 2. 准备工作：模型与数据</span>
+<span class="c1"># 2. 数据预处理与加载</span>
 <span class="c1"># ==========================================</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">get_model_and_transforms</span><span class="p">():</span>
-    <span class="c1"># 1. 创建模型</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">timm</span><span class="o">.</span><span class="n">create_model</span><span class="p">(</span>
-        <span class="n">Config</span><span class="o">.</span><span class="n">model_name</span><span class="p">,</span>
-        <span class="n">pretrained</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">pretrained</span><span class="p">,</span>
-        <span class="n">checkpoint_path</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">checkpoint_path</span><span class="p">,</span>
-        <span class="n">num_classes</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">num_classes</span>
-    <span class="p">)</span>
-    <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_transforms</span><span class="p">(</span><span class="n">model_cfg</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;根据模型配置自动生成预处理流程&quot;&quot;&quot;</span>
+    <span class="c1"># 自动获取模型所需的输入尺寸</span>
+    <span class="n">input_size</span> <span class="o">=</span> <span class="n">model_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;input_size&#39;</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">))</span>
+    <span class="n">crop_size</span> <span class="o">=</span> <span class="n">input_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> 
 
-    <span class="c1"># 2. 获取默认配置并打印</span>
-    <span class="n">config</span> <span class="o">=</span> <span class="n">resolve_data_config</span><span class="p">({},</span> <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">)</span>
-    <span class="c1"># print(f&quot;[Info] Model Config: {config}&quot;)</span>
+    <span class="c1"># 获取模型特定的均值和方差</span>
+    <span class="n">mean</span> <span class="o">=</span> <span class="n">model_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">])</span>
+    <span class="n">std</span> <span class="o">=</span> <span class="n">model_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;std&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.229</span><span class="p">,</span> <span class="mf">0.224</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">])</span>
 
-    <span class="c1"># 3. 定义数据增强 [可微调]</span>
-    <span class="c1"># 训练集：需要增强</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[Info] 预处理配置: Size=</span><span class="si">{</span><span class="n">crop_size</span><span class="si">}</span><span class="s2">, Mean=</span><span class="si">{</span><span class="n">mean</span><span class="si">}</span><span class="s2">, Std=</span><span class="si">{</span><span class="n">std</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># 训练集增强</span>
     <span class="n">train_transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span>
-        <span class="n">transforms</span><span class="o">.</span><span class="n">Resize</span><span class="p">((</span><span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">)),</span>
-        <span class="n">transforms</span><span class="o">.</span><span class="n">CenterCrop</span><span class="p">(</span><span class="mi">224</span><span class="p">),</span>  <span class="c1"># 或使用 RandomResizedCrop(224)</span>
-        <span class="n">transforms</span><span class="o">.</span><span class="n">RandomHorizontalFlip</span><span class="p">(</span><span class="mf">0.5</span><span class="p">),</span>
-        <span class="n">transforms</span><span class="o">.</span><span class="n">RandomRotation</span><span class="p">(</span><span class="mi">15</span><span class="p">),</span>  <span class="c1"># 随机旋转</span>
-        <span class="n">transforms</span><span class="o">.</span><span class="n">ColorJitter</span><span class="p">(</span><span class="n">brightness</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">contrast</span><span class="o">=</span><span class="mf">0.1</span><span class="p">),</span>  <span class="c1"># 颜色抖动</span>
+        <span class="n">transforms</span><span class="o">.</span><span class="n">Resize</span><span class="p">((</span><span class="n">crop_size</span><span class="p">,</span> <span class="n">crop_size</span><span class="p">)),</span>  <span class="c1"># 统一图像尺寸</span>
+        <span class="n">transforms</span><span class="o">.</span><span class="n">RandomHorizontalFlip</span><span class="p">(</span><span class="mf">0.5</span><span class="p">),</span>       <span class="c1"># &lt;--- [可微调] 随机水平翻转概率</span>
+        <span class="n">transforms</span><span class="o">.</span><span class="n">RandomRotation</span><span class="p">(</span><span class="mi">15</span><span class="p">),</span>              <span class="c1"># &lt;--- [可微调] 随机旋转角度</span>
+        <span class="n">transforms</span><span class="o">.</span><span class="n">ColorJitter</span><span class="p">(</span><span class="n">brightness</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">contrast</span><span class="o">=</span><span class="mf">0.1</span><span class="p">),</span> <span class="c1"># &lt;--- [可微调] 颜色/对比度扰动</span>
         <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
-        <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="p">[</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">],</span> <span class="n">std</span><span class="o">=</span><span class="p">[</span><span class="mf">0.229</span><span class="p">,</span> <span class="mf">0.224</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">])</span>
+        <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="n">mean</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="n">std</span><span class="p">)</span>
     <span class="p">])</span>
 
-    <span class="c1"># 验证集/测试集：不需要增强，只需要标准化</span>
+    <span class="c1"># 验证/测试集处理 (仅标准化)</span>
     <span class="n">val_test_transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span>
-        <span class="n">transforms</span><span class="o">.</span><span class="n">Resize</span><span class="p">((</span><span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">)),</span>
-        <span class="n">transforms</span><span class="o">.</span><span class="n">CenterCrop</span><span class="p">(</span><span class="mi">224</span><span class="p">),</span>
+        <span class="n">transforms</span><span class="o">.</span><span class="n">Resize</span><span class="p">((</span><span class="n">crop_size</span><span class="p">,</span> <span class="n">crop_size</span><span class="p">)),</span>
         <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
-        <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="p">[</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">],</span> <span class="n">std</span><span class="o">=</span><span class="p">[</span><span class="mf">0.229</span><span class="p">,</span> <span class="mf">0.224</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">])</span>
+        <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="n">mean</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="n">std</span><span class="p">)</span>
     <span class="p">])</span>
 
-    <span class="k">return</span> <span class="n">model</span><span class="p">,</span> <span class="n">train_transform</span><span class="p">,</span> <span class="n">val_test_transform</span>
+    <span class="k">return</span> <span class="n">train_transform</span><span class="p">,</span> <span class="n">val_test_transform</span>
 
+<span class="k">def</span><span class="w"> </span><span class="nf">get_dataloaders</span><span class="p">(</span><span class="n">train_tf</span><span class="p">,</span> <span class="n">val_tf</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;根据配置加载内置或自定义数据集&quot;&quot;&quot;</span>
+    <span class="n">train_ds</span><span class="p">,</span> <span class="n">val_ds</span><span class="p">,</span> <span class="n">test_ds</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="n">class_names</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># --- 分支 1: 使用内置数据集 ---</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">Config</span><span class="o">.</span><span class="n">USE_CUSTOM_DATASET</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[Data] 加载内置数据集: </span><span class="si">{</span><span class="n">Config</span><span class="o">.</span><span class="n">BUILTIN_NAME</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">DatasetClass</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">datasets</span><span class="p">,</span> <span class="n">Config</span><span class="o">.</span><span class="n">BUILTIN_NAME</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;不支持的数据集: </span><span class="si">{</span><span class="n">Config</span><span class="o">.</span><span class="n">BUILTIN_NAME</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># 加载完整数据集</span>
+        <span class="n">full_train_ds</span> <span class="o">=</span> <span class="n">DatasetClass</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">DATA_DOWNLOAD_ROOT</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">train_tf</span><span class="p">)</span>
+        <span class="n">test_ds</span>       <span class="o">=</span> <span class="n">DatasetClass</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">DATA_DOWNLOAD_ROOT</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">val_tf</span><span class="p">)</span>
+
+        <span class="c1"># 自动划分验证集 (90% 训练, 10% 验证)</span>
+        <span class="n">train_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mf">0.9</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">full_train_ds</span><span class="p">))</span> <span class="c1"># &lt;--- [可微调] 验证集比例</span>
+        <span class="n">val_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">full_train_ds</span><span class="p">)</span> <span class="o">-</span> <span class="n">train_size</span>
+        <span class="n">train_ds</span><span class="p">,</span> <span class="n">val_ds</span> <span class="o">=</span> <span class="n">random_split</span><span class="p">(</span><span class="n">full_train_ds</span><span class="p">,</span> <span class="p">[</span><span class="n">train_size</span><span class="p">,</span> <span class="n">val_size</span><span class="p">])</span>
+
+        <span class="n">class_names</span> <span class="o">=</span> <span class="n">full_train_ds</span><span class="o">.</span><span class="n">classes</span>
+
+    <span class="c1"># --- 分支 2: 使用自定义文件夹 ---</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[Data] 加载自定义文件夹: </span><span class="si">{</span><span class="n">Config</span><span class="o">.</span><span class="n">CUSTOM_DATA_ROOT</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">train_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">CUSTOM_DATA_ROOT</span><span class="p">,</span> <span class="s2">&quot;train&quot;</span><span class="p">)</span>
+        <span class="n">val_dir</span>   <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">CUSTOM_DATA_ROOT</span><span class="p">,</span> <span class="s2">&quot;val&quot;</span><span class="p">)</span>
+        <span class="n">test_dir</span>  <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">CUSTOM_DATA_ROOT</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">train_dir</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;找不到训练目录: </span><span class="si">{</span><span class="n">train_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">train_ds</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">ImageFolder</span><span class="p">(</span><span class="n">train_dir</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">train_tf</span><span class="p">)</span>
+        <span class="n">val_ds</span>   <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">ImageFolder</span><span class="p">(</span><span class="n">val_dir</span><span class="p">,</span>   <span class="n">transform</span><span class="o">=</span><span class="n">val_tf</span><span class="p">)</span>
+
+        <span class="c1"># 检查是否存在测试集</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">test_dir</span><span class="p">):</span>
+            <span class="n">test_ds</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">ImageFolder</span><span class="p">(</span><span class="n">test_dir</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">val_tf</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[Info] 未找到 test 文件夹，跳过测试步骤。&quot;</span><span class="p">)</span>
+
+        <span class="n">class_names</span> <span class="o">=</span> <span class="n">train_ds</span><span class="o">.</span><span class="n">classes</span>
+
+    <span class="c1"># 更新全局类别数</span>
+    <span class="n">Config</span><span class="o">.</span><span class="n">NUM_CLASSES</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">class_names</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[Data] 检测到 </span><span class="si">{</span><span class="n">Config</span><span class="o">.</span><span class="n">NUM_CLASSES</span><span class="si">}</span><span class="s2"> 个类别: </span><span class="si">{</span><span class="n">class_names</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># 创建DataLoader</span>
+    <span class="n">train_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">train_ds</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">val_loader</span>   <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">val_ds</span><span class="p">,</span>   <span class="n">batch_size</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">test_loader</span>  <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">test_ds</span><span class="p">,</span>  <span class="n">batch_size</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span> <span class="k">if</span> <span class="n">test_ds</span> <span class="k">else</span> <span class="kc">None</span>
+
+    <span class="k">return</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">,</span> <span class="n">test_loader</span><span class="p">,</span> <span class="n">class_names</span>
 
 <span class="c1"># ==========================================</span>
-<span class="c1"># 3. 核心功能：训练、验证、测试</span>
+<span class="c1"># 3. 训练与验证逻辑</span>
 <span class="c1"># ==========================================</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">train_one_epoch</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">loader</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">epoch</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;训练一个Epoch&quot;&quot;&quot;</span>
     <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
     <span class="n">total_loss</span><span class="p">,</span> <span class="n">total_correct</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mi">0</span>
 
-    <span class="n">bar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">loader</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Epoch </span><span class="si">{</span><span class="n">epoch</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">Config</span><span class="o">.</span><span class="n">epochs</span><span class="si">}</span><span class="s2"> [Train]&quot;</span><span class="p">)</span>
+    <span class="n">bar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">loader</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Epoch </span><span class="si">{</span><span class="n">epoch</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">Config</span><span class="o">.</span><span class="n">EPOCHS</span><span class="si">}</span><span class="s2"> [Train]&quot;</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">imgs</span><span class="p">,</span> <span class="n">labels</span> <span class="ow">in</span> <span class="n">bar</span><span class="p">:</span>
-        <span class="n">imgs</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">imgs</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">device</span><span class="p">),</span> <span class="n">labels</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">imgs</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">imgs</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">DEVICE</span><span class="p">),</span> <span class="n">labels</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">DEVICE</span><span class="p">)</span>
 
         <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
         <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">imgs</span><span class="p">)</span>
@@ -801,20 +866,19 @@
 
         <span class="n">total_loss</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="o">*</span> <span class="n">imgs</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">total_correct</span> <span class="o">+=</span> <span class="p">(</span><span class="n">outputs</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="n">labels</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-
         <span class="n">bar</span><span class="o">.</span><span class="n">set_postfix</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
 
     <span class="k">return</span> <span class="n">total_loss</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">loader</span><span class="o">.</span><span class="n">dataset</span><span class="p">),</span> <span class="n">total_correct</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">loader</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span>
 
-
 <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">loader</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">phase</span><span class="o">=</span><span class="s2">&quot;Val&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;验证模型性能&quot;&quot;&quot;</span>
     <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
     <span class="n">total_loss</span><span class="p">,</span> <span class="n">total_correct</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mi">0</span>
 
-    <span class="n">bar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">loader</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Epoch </span><span class="si">{</span><span class="n">epoch</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">Config</span><span class="o">.</span><span class="n">epochs</span><span class="si">}</span><span class="s2"> [</span><span class="si">{</span><span class="n">phase</span><span class="si">}</span><span class="s2">]  &quot;</span><span class="p">)</span>
+    <span class="n">bar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">loader</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Epoch </span><span class="si">{</span><span class="n">epoch</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">Config</span><span class="o">.</span><span class="n">EPOCHS</span><span class="si">}</span><span class="s2"> [</span><span class="si">{</span><span class="n">phase</span><span class="si">}</span><span class="s2">]  &quot;</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">imgs</span><span class="p">,</span> <span class="n">labels</span> <span class="ow">in</span> <span class="n">bar</span><span class="p">:</span>
-        <span class="n">imgs</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">imgs</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">device</span><span class="p">),</span> <span class="n">labels</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">imgs</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">imgs</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">DEVICE</span><span class="p">),</span> <span class="n">labels</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">DEVICE</span><span class="p">)</span>
         <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">imgs</span><span class="p">)</span>
         <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
 
@@ -824,14 +888,10 @@
 
     <span class="k">return</span> <span class="n">total_loss</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">loader</span><span class="o">.</span><span class="n">dataset</span><span class="p">),</span> <span class="n">total_correct</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">loader</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span>
 
-
 <span class="k">def</span><span class="w"> </span><span class="nf">evaluate_test_set</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">test_loader</span><span class="p">,</span> <span class="n">class_names</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    独立测试函数：输出分类报告和混淆矩阵</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">HAS_SKLEARN</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[Info] 跳过详细测试报告（缺少sklearn库）&quot;</span><span class="p">)</span>
-        <span class="k">return</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;测试集详细评估：生成报告与混淆矩阵&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">test_loader</span><span class="p">:</span> <span class="k">return</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">HAS_SKLEARN</span><span class="p">:</span> <span class="k">return</span>
 
     <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
     <span class="n">all_preds</span> <span class="o">=</span> <span class="p">[]</span>
@@ -840,94 +900,106 @@
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[Test] 正在进行最终测试集评估...&quot;</span><span class="p">)</span>
     <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
         <span class="k">for</span> <span class="n">imgs</span><span class="p">,</span> <span class="n">labels</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">test_loader</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Testing&quot;</span><span class="p">):</span>
-            <span class="n">imgs</span> <span class="o">=</span> <span class="n">imgs</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
-            <span class="n">labels</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">imgs</span> <span class="o">=</span> <span class="n">imgs</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">DEVICE</span><span class="p">),</span> <span class="n">labels</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">DEVICE</span><span class="p">)</span> <span class="c1"># 确保数据在同一设备</span>
+            <span class="n">imgs</span> <span class="o">=</span> <span class="n">imgs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># 解包</span>
+            <span class="n">labels</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
             <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">imgs</span><span class="p">)</span>
             <span class="n">preds</span> <span class="o">=</span> <span class="n">outputs</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-
             <span class="n">all_preds</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">preds</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
             <span class="n">all_labels</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">labels</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
 
-    <span class="c1"># 1. 打印分类报告 (Precision, Recall, F1)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
+    <span class="c1"># 打印分类报告</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">50</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;FINAL TEST REPORT&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">50</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">classification_report</span><span class="p">(</span><span class="n">all_labels</span><span class="p">,</span> <span class="n">all_preds</span><span class="p">,</span> <span class="n">target_names</span><span class="o">=</span><span class="n">class_names</span><span class="p">,</span> <span class="n">digits</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
 
-    <span class="c1"># 2. 绘制混淆矩阵</span>
+    <span class="c1"># 绘制混淆矩阵</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
     <span class="n">cm</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">all_labels</span><span class="p">,</span> <span class="n">all_preds</span><span class="p">)</span>
-    <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">cm</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Blues&#39;</span><span class="p">,</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">cm</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Blues&#39;</span><span class="p">,</span> 
                 <span class="n">xticklabels</span><span class="o">=</span><span class="n">class_names</span><span class="p">,</span> <span class="n">yticklabels</span><span class="o">=</span><span class="n">class_names</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Predicted Label&#39;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;True Label&#39;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Confusion Matrix&#39;</span><span class="p">)</span>
-    <span class="n">save_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">save_dir</span><span class="p">,</span> <span class="s1">&#39;confusion_matrix.png&#39;</span><span class="p">)</span>
+    <span class="n">save_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">SAVE_DIR</span><span class="p">,</span> <span class="s1">&#39;confusion_matrix.png&#39;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_path</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[Info] 混淆矩阵已保存至: </span><span class="si">{</span><span class="n">save_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="c1"># plt.show()</span>
 
-
-<span class="c1"># ==========================================</span>
-<span class="c1"># 4. 辅助功能：画图</span>
-<span class="c1"># ==========================================</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_history</span><span class="p">(</span><span class="n">history</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;绘制训练曲线&quot;&quot;&quot;</span>
     <span class="n">epochs</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">history</span><span class="p">[</span><span class="s1">&#39;train_acc&#39;</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-
     <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
 
-    <span class="c1"># Accuracy Curve</span>
+    <span class="c1"># 准确率曲线</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">epochs</span><span class="p">,</span> <span class="n">history</span><span class="p">[</span><span class="s1">&#39;train_acc&#39;</span><span class="p">],</span> <span class="s1">&#39;b-o&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Train Acc&#39;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">epochs</span><span class="p">,</span> <span class="n">history</span><span class="p">[</span><span class="s1">&#39;val_acc&#39;</span><span class="p">],</span> <span class="s1">&#39;r-o&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Val Acc&#39;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Training and Validation Accuracy&#39;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Accuracy&#39;</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 
-    <span class="c1"># Loss Curve</span>
+    <span class="c1"># 损失曲线</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">epochs</span><span class="p">,</span> <span class="n">history</span><span class="p">[</span><span class="s1">&#39;train_loss&#39;</span><span class="p">],</span> <span class="s1">&#39;b-o&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Train Loss&#39;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">epochs</span><span class="p">,</span> <span class="n">history</span><span class="p">[</span><span class="s1">&#39;val_loss&#39;</span><span class="p">],</span> <span class="s1">&#39;r-o&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Val Loss&#39;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Training and Validation Loss&#39;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Loss&#39;</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 
     <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="s1">&#39;training_curve.png&#39;</span><span class="p">))</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[Info] 训练曲线已保存至: </span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;training_curve.png&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[Info] 训练曲线已保存至: </span><span class="si">{</span><span class="n">save_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="c1"># ==========================================</span>
-<span class="c1"># 5. 主程序入口</span>
+<span class="c1"># 4. 主程序入口</span>
 <span class="c1"># ==========================================</span>
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="c1"># 初始化</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">save_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">model</span><span class="p">,</span> <span class="n">train_tf</span><span class="p">,</span> <span class="n">val_test_tf</span> <span class="o">=</span> <span class="n">get_model_and_transforms</span><span class="p">()</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">SAVE_DIR</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="c1"># 加载数据集</span>
-    <span class="c1"># 假设目录结构为: data_root/train, data_root/val, data_root/test</span>
-    <span class="n">train_ds</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">ImageFolder</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">data_root</span><span class="p">,</span> <span class="s2">&quot;train&quot;</span><span class="p">),</span> <span class="n">transform</span><span class="o">=</span><span class="n">train_tf</span><span class="p">)</span>
-    <span class="n">val_ds</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">ImageFolder</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">data_root</span><span class="p">,</span> <span class="s2">&quot;val&quot;</span><span class="p">),</span> <span class="n">transform</span><span class="o">=</span><span class="n">val_test_tf</span><span class="p">)</span>
+    <span class="c1"># --- 1. 获取模型默认配置 ---</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[Init] 获取 </span><span class="si">{</span><span class="n">Config</span><span class="o">.</span><span class="n">MODEL_NAME</span><span class="si">}</span><span class="s2"> 默认配置...&quot;</span><span class="p">)</span>
+    <span class="n">temp_model</span> <span class="o">=</span> <span class="n">timm</span><span class="o">.</span><span class="n">create_model</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">MODEL_NAME</span><span class="p">,</span> <span class="n">pretrained</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">model_cfg</span> <span class="o">=</span> <span class="n">resolve_data_config</span><span class="p">({},</span> <span class="n">model</span><span class="o">=</span><span class="n">temp_model</span><span class="p">)</span>
+    <span class="k">del</span> <span class="n">temp_model</span> 
 
-    <span class="n">train_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">train_ds</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-    <span class="n">val_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">val_ds</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+    <span class="c1"># --- 2. 准备数据 ---</span>
+    <span class="n">train_tf</span><span class="p">,</span> <span class="n">val_test_tf</span> <span class="o">=</span> <span class="n">get_transforms</span><span class="p">(</span><span class="n">model_cfg</span><span class="p">)</span>
+    <span class="n">train_loader</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">,</span> <span class="n">test_loader</span><span class="p">,</span> <span class="n">class_names</span> <span class="o">=</span> <span class="n">get_dataloaders</span><span class="p">(</span><span class="n">train_tf</span><span class="p">,</span> <span class="n">val_test_tf</span><span class="p">)</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[Data] Train: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">train_ds</span><span class="p">)</span><span class="si">}</span><span class="s2"> | Val: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">val_ds</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="c1"># --- 3. 初始化模型 (核心修改点) ---</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[Init] 创建模型: </span><span class="si">{</span><span class="n">Config</span><span class="o">.</span><span class="n">MODEL_NAME</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="c1"># 定义优化器与损失</span>
+    <span class="c1"># 判断是否加载本地权重</span>
+    <span class="k">if</span> <span class="n">Config</span><span class="o">.</span><span class="n">CHECKPOINT_PATH</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">CHECKPOINT_PATH</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[Load] 加载本地权重: </span><span class="si">{</span><span class="n">Config</span><span class="o">.</span><span class="n">CHECKPOINT_PATH</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">timm</span><span class="o">.</span><span class="n">create_model</span><span class="p">(</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">MODEL_NAME</span><span class="p">,</span>
+            <span class="n">pretrained</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>                       <span class="c1"># 关闭自动下载</span>
+            <span class="n">checkpoint_path</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">CHECKPOINT_PATH</span>  <span class="c1"># 指定本地路径</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[Load] 使用在线预训练权重 (pretrained=True)&quot;</span><span class="p">)</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">timm</span><span class="o">.</span><span class="n">create_model</span><span class="p">(</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">MODEL_NAME</span><span class="p">,</span>
+            <span class="n">pretrained</span><span class="o">=</span><span class="kc">True</span>                         <span class="c1"># 开启自动下载</span>
+        <span class="p">)</span>
+
+    <span class="c1"># 重置分类头以匹配当前数据类别</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[Init] 重置分类头为 </span><span class="si">{</span><span class="n">Config</span><span class="o">.</span><span class="n">NUM_CLASSES</span><span class="si">}</span><span class="s2"> 类&quot;</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">reset_classifier</span><span class="p">(</span><span class="n">num_classes</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">NUM_CLASSES</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">DEVICE</span><span class="p">)</span>
+
+    <span class="c1"># --- 4. 训练循环 ---</span>
     <span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">()</span>
-    <span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">lr</span><span class="p">,</span> <span class="n">weight_decay</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">weight_decay</span><span class="p">)</span>
+    <span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">LR</span><span class="p">,</span> <span class="n">weight_decay</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">WEIGHT_DECAY</span><span class="p">)</span>
 
-    <span class="c1"># ---------------------------</span>
-    <span class="c1"># Phase 1: 训练循环</span>
-    <span class="c1"># ---------------------------</span>
     <span class="n">history</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;train_loss&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;train_acc&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;val_loss&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;val_acc&#39;</span><span class="p">:</span> <span class="p">[]}</span>
     <span class="n">best_acc</span> <span class="o">=</span> <span class="mf">0.0</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[Start] 开始训练... (Total Epochs: </span><span class="si">{</span><span class="n">Config</span><span class="o">.</span><span class="n">epochs</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">Config</span><span class="o">.</span><span class="n">epochs</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[Start] 开始训练... (设备: </span><span class="si">{</span><span class="n">Config</span><span class="o">.</span><span class="n">DEVICE</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">Config</span><span class="o">.</span><span class="n">EPOCHS</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
         <span class="n">t_loss</span><span class="p">,</span> <span class="n">t_acc</span> <span class="o">=</span> <span class="n">train_one_epoch</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">epoch</span><span class="p">)</span>
-        <span class="n">v_loss</span><span class="p">,</span> <span class="n">v_acc</span> <span class="o">=</span> <span class="n">validate</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">phase</span><span class="o">=</span><span class="s2">&quot;Val&quot;</span><span class="p">)</span>
+        <span class="n">v_loss</span><span class="p">,</span> <span class="n">v_acc</span> <span class="o">=</span> <span class="n">validate</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">epoch</span><span class="p">)</span>
 
+        <span class="c1"># 记录日志</span>
         <span class="n">history</span><span class="p">[</span><span class="s1">&#39;train_loss&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t_loss</span><span class="p">)</span>
         <span class="n">history</span><span class="p">[</span><span class="s1">&#39;train_acc&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t_acc</span><span class="p">)</span>
         <span class="n">history</span><span class="p">[</span><span class="s1">&#39;val_loss&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v_loss</span><span class="p">)</span>
@@ -938,37 +1010,18 @@
         <span class="c1"># 保存最佳模型</span>
         <span class="k">if</span> <span class="n">v_acc</span> <span class="o">&gt;</span> <span class="n">best_acc</span><span class="p">:</span>
             <span class="n">best_acc</span> <span class="o">=</span> <span class="n">v_acc</span>
-            <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">save_dir</span><span class="p">,</span> <span class="s2">&quot;best_model.pth&quot;</span><span class="p">))</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">SAVE_DIR</span><span class="p">,</span> <span class="s2">&quot;best_model.pth&quot;</span><span class="p">))</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; -&gt; 🌟 最佳模型已更新 (Acc: </span><span class="si">{</span><span class="n">best_acc</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
 
-    <span class="c1"># 绘制曲线</span>
-    <span class="n">plot_history</span><span class="p">(</span><span class="n">history</span><span class="p">,</span> <span class="n">Config</span><span class="o">.</span><span class="n">save_dir</span><span class="p">)</span>
+    <span class="c1"># --- 5. 结果可视化与测试 ---</span>
+    <span class="n">plot_history</span><span class="p">(</span><span class="n">history</span><span class="p">,</span> <span class="n">Config</span><span class="o">.</span><span class="n">SAVE_DIR</span><span class="p">)</span>
 
-    <span class="c1"># ---------------------------</span>
-    <span class="c1"># Phase 2: 测试集评估</span>
-    <span class="c1"># ---------------------------</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">30</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;进入测试阶段 (Test Phase)&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">30</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">test_loader</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[Info] 加载最佳模型进行最终测试...&quot;</span><span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">SAVE_DIR</span><span class="p">,</span> <span class="s2">&quot;best_model.pth&quot;</span><span class="p">)))</span>
+        <span class="n">evaluate_test_set</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">test_loader</span><span class="p">,</span> <span class="n">class_names</span><span class="p">)</span>
 
-    <span class="c1"># 1. 加载测试数据 (注意使用 val_test_tf，不做增强)</span>
-    <span class="n">test_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">data_root</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">test_dir</span><span class="p">):</span>
-        <span class="n">test_ds</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">ImageFolder</span><span class="p">(</span><span class="n">test_dir</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">val_test_tf</span><span class="p">)</span>
-        <span class="n">test_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">test_ds</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-
-        <span class="c1"># 2. 必须重新加载最佳权重 (Best Weights)</span>
-        <span class="n">best_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">save_dir</span><span class="p">,</span> <span class="s2">&quot;best_model.pth&quot;</span><span class="p">)</span>
-        <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">best_path</span><span class="p">))</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[Info] 已加载最佳权重用于测试: </span><span class="si">{</span><span class="n">best_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-        <span class="c1"># 3. 执行详细评估</span>
-        <span class="n">evaluate_test_set</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">test_loader</span><span class="p">,</span> <span class="n">train_ds</span><span class="o">.</span><span class="n">classes</span><span class="p">)</span>
-
-    <span class="k">else</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[Warning] 未找到测试集文件夹 </span><span class="si">{</span><span class="n">test_dir</span><span class="si">}</span><span class="s2">，跳过测试步骤。&quot;</span><span class="p">)</span>
-
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[Done] 所有任务完成。&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[Done] 全部完成！&quot;</span><span class="p">)</span>
 </code></pre></div>
 
 
