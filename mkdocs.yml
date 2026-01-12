@@ -45,4 +45,7 @@ nav:
   - 首页: index.md
   - 博客指南: guide.md
   - 建站心得: build_blog.md
-  - 个人: secret.md
+  - 个人笔记:
+      - 计算机视觉:
+          - 数据集划分: cv/Split_datasets.md
+          - 图像分类: cv/Image_Classification.md
