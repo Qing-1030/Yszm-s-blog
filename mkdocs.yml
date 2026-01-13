@@ -49,3 +49,4 @@ nav:
       - 计算机视觉:
           - 数据集划分: cv/Split_datasets.md
           - 图像分类: cv/Image_Classification.md
+          - 检验模型: cv/Predict_img.md
