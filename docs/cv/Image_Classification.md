@@ -54,7 +54,7 @@ class Config:
     SAVE_DIR = ""                    # (运行时自动生成)
     
     # --- 模型设置 ---
-    MODEL_NAME = "resnet50"          # <--- [可微调] 模型名称
+    MODEL_NAME = "resnet50"          # <--- [可微调] 模型名称 (timm库支持的名称)
     CHECKPOINT_PATH = ""             # <--- [可微调] 初始预训练权重 (迁移学习用)
     RESUME_PATH = ""                 # <--- [可微调] 断点续训文件路径 (.pth)
     NUM_CLASSES = 0                  # (运行时自动覆盖)
@@ -66,10 +66,6 @@ class Config:
     WEIGHT_DECAY = 1e-4              # <--- [可微调] L2正则化系数
     SEED = 42                        # <--- [可微调] 随机种子
     
-    # --- 高级技巧 ---
-    USE_AMP = True                   # <--- [可微调] 是否开启混合精度 (推荐True)
-    LABEL_SMOOTHING = 0.1            # <--- [可微调] 标签平滑系数
-    
     # --- 策略选择 ---
     OPTIMIZER_NAME = 'adamw'         # <--- [可微调] 'adamw', 'adam', 'sgd'
     SCHEDULER_NAME = 'plateau'       # <--- [可微调] 'plateau', 'cosine', 'step'
@@ -78,7 +74,7 @@ class Config:
     DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # ==========================================
-# 2. 辅助工具 (日志/随机种子/早停)
+# 2. 辅助工具
 # ==========================================
 def setup_logger(save_dir):
     """配置日志：同时输出到文件和控制台"""
@@ -193,34 +189,28 @@ def get_dataloaders(train_tf, val_tf, logger):
     Config.NUM_CLASSES = len(class_names)
     logger.info(f"[Data] 类别数: {Config.NUM_CLASSES}")
     
-    # num_workers可根据CPU核心数微调
-    train_dl = DataLoader(train_ds, batch_size=Config.BATCH_SIZE, shuffle=True, num_workers=4, pin_memory=True)
-    val_dl = DataLoader(val_ds, batch_size=Config.BATCH_SIZE, shuffle=False, num_workers=4, pin_memory=True)
-    test_dl = DataLoader(test_ds, batch_size=Config.BATCH_SIZE, shuffle=False, num_workers=4, pin_memory=True) if test_ds else None
+    train_dl = DataLoader(train_ds, batch_size=Config.BATCH_SIZE, shuffle=True, num_workers=4)
+    val_dl = DataLoader(val_ds, batch_size=Config.BATCH_SIZE, shuffle=False, num_workers=4)
+    test_dl = DataLoader(test_ds, batch_size=Config.BATCH_SIZE, shuffle=False, num_workers=4) if test_ds else None
     
     return train_dl, val_dl, test_dl, class_names, ds_name
 
 # ==========================================
 # 4. 训练与验证核心
 # ==========================================
-def train_one_epoch(model, loader, criterion, optimizer, scaler, epoch):
+def train_one_epoch(model, loader, criterion, optimizer, epoch):
     model.train()
     total_loss, total_correct = 0.0, 0
     bar = tqdm(loader, desc=f"Epoch {epoch}/{Config.EPOCHS} [Train]", leave=False)
     
     for imgs, labels in bar:
         imgs, labels = imgs.to(Config.DEVICE), labels.to(Config.DEVICE)
+        
         optimizer.zero_grad()
-        
-        # AMP 混合精度前向传播
-        with torch.cuda.amp.autocast(enabled=Config.USE_AMP):
-            outputs = model(imgs)
-            loss = criterion(outputs, labels)
-        
-        # AMP 反向传播
-        scaler.scale(loss).backward()
-        scaler.step(optimizer)
-        scaler.update()
+        outputs = model(imgs)
+        loss = criterion(outputs, labels)
+        loss.backward()
+        optimizer.step()
         
         total_loss += loss.item() * imgs.size(0)
         total_correct += (outputs.argmax(1) == labels).sum().item()
@@ -236,9 +226,8 @@ def validate(model, loader, criterion, epoch, phase="Val"):
     
     for imgs, labels in bar:
         imgs, labels = imgs.to(Config.DEVICE), labels.to(Config.DEVICE)
-        with torch.cuda.amp.autocast(enabled=Config.USE_AMP):
-            outputs = model(imgs)
-            loss = criterion(outputs, labels)
+        outputs = model(imgs)
+        loss = criterion(outputs, labels)
             
         total_loss += loss.item() * imgs.size(0)
         total_correct += (outputs.argmax(1) == labels).sum().item()
@@ -256,8 +245,7 @@ def evaluate_test_set(model, loader, class_names, logger):
     with torch.no_grad():
         for imgs, labels in tqdm(loader, desc="Testing"):
             imgs, labels = imgs.to(Config.DEVICE), labels.to(Config.DEVICE)
-            with torch.cuda.amp.autocast(enabled=Config.USE_AMP):
-                outputs = model(imgs)
+            outputs = model(imgs)
             preds.extend(outputs.argmax(1).cpu().numpy())
             targets.extend(labels.cpu().numpy())
     
@@ -291,10 +279,17 @@ if __name__ == "__main__":
     
     # 1. 确定保存目录
     if Config.RESUME_PATH:
+        # 断点续训复用原目录
         Config.SAVE_DIR = os.path.dirname(Config.RESUME_PATH)
     else:
-        # 此时还未加载数据，暂用时间戳命名，后续日志会记录dataset名
-        run_name = f"{Config.MODEL_NAME}_{time.strftime('%Y%m%d_%H%M%S')}"
+        # 获取数据集名称用于命名
+        if Config.USE_CUSTOM_DATASET:
+            ds_name = os.path.basename(Config.CUSTOM_DATA_ROOT)
+        else:
+            ds_name = Config.BUILTIN_NAME
+            
+        # 格式: 模型名_数据集名_时间戳
+        run_name = f"{Config.MODEL_NAME}_{ds_name}_{time.strftime('%Y%m%d_%H%M%S')}"
         Config.SAVE_DIR = os.path.join(Config.SAVE_DIR_ROOT, run_name)
         os.makedirs(Config.SAVE_DIR, exist_ok=True)
     
@@ -320,14 +315,13 @@ if __name__ == "__main__":
     model.reset_classifier(num_classes=Config.NUM_CLASSES)
     model.to(Config.DEVICE)
     
-    # 4. 优化器/调度器/Loss/Scaler
+    # 4. 优化器/调度器/Loss
     optimizer = get_optimizer(model)
     scheduler = get_scheduler(optimizer)
-    criterion = nn.CrossEntropyLoss(label_smoothing=Config.LABEL_SMOOTHING)
-    scaler = torch.cuda.amp.GradScaler(enabled=Config.USE_AMP)
+    criterion = nn.CrossEntropyLoss()
     early_stop = EarlyStopping(patience=Config.EARLY_STOP_PATIENCE) if Config.EARLY_STOP_PATIENCE > 0 else None
     
-    # 5. 断点恢复
+    # 5. 断点恢复逻辑
     start_epoch = 1
     best_acc = 0.0
     history = {'train_loss': [], 'train_acc': [], 'val_loss': [], 'val_acc': []}
@@ -338,7 +332,7 @@ if __name__ == "__main__":
         model.load_state_dict(ckpt['state_dict'])
         optimizer.load_state_dict(ckpt['optimizer'])
         if scheduler and 'scheduler' in ckpt: scheduler.load_state_dict(ckpt['scheduler'])
-        if 'scaler' in ckpt: scaler.load_state_dict(ckpt['scaler'])
+        
         start_epoch = ckpt['epoch'] + 1
         best_acc = ckpt['best_acc']
         history = ckpt['history']
@@ -347,7 +341,7 @@ if __name__ == "__main__":
     # 6. 训练循环
     logger.info("[Start] 开始训练...")
     for epoch in range(start_epoch, Config.EPOCHS + 1):
-        t_loss, t_acc = train_one_epoch(model, train_dl, criterion, optimizer, scaler, epoch)
+        t_loss, t_acc = train_one_epoch(model, train_dl, criterion, optimizer, epoch)
         v_loss, v_acc = validate(model, val_dl, criterion, epoch)
         
         history['train_loss'].append(t_loss); history['train_acc'].append(t_acc)
@@ -355,25 +349,28 @@ if __name__ == "__main__":
         
         logger.info(f"Epoch {epoch}: Train Acc: {t_acc:.4f} | Val Acc: {v_acc:.4f} | Loss: {t_loss:.4f}")
         
+        # 学习率更新
         if scheduler:
             if Config.SCHEDULER_NAME == 'plateau': scheduler.step(v_acc)
             else: scheduler.step()
             
+        # 保存最佳模型
         is_best = v_acc > best_acc
         if is_best:
             best_acc = v_acc
             logger.info(f" -> 🌟 新的最佳模型 (Acc: {best_acc:.4f})")
             
+        # 保存断点
         save_checkpoint({
             'epoch': epoch,
             'state_dict': model.state_dict(),
             'best_acc': best_acc,
             'optimizer': optimizer.state_dict(),
             'scheduler': scheduler.state_dict() if scheduler else None,
-            'scaler': scaler.state_dict(),
             'history': history
         }, is_best)
         
+        # 早停检测
         if early_stop:
             early_stop(v_acc)
             if early_stop.early_stop:
