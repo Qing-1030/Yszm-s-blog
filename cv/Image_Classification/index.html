@@ -767,7 +767,7 @@
     <span class="n">SAVE_DIR</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>                    <span class="c1"># (运行时自动生成)</span>
 
     <span class="c1"># --- 模型设置 ---</span>
-    <span class="n">MODEL_NAME</span> <span class="o">=</span> <span class="s2">&quot;resnet50&quot;</span>          <span class="c1"># &lt;--- [可微调] 模型名称</span>
+    <span class="n">MODEL_NAME</span> <span class="o">=</span> <span class="s2">&quot;resnet50&quot;</span>          <span class="c1"># &lt;--- [可微调] 模型名称 (timm库支持的名称)</span>
     <span class="n">CHECKPOINT_PATH</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>             <span class="c1"># &lt;--- [可微调] 初始预训练权重 (迁移学习用)</span>
     <span class="n">RESUME_PATH</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>                 <span class="c1"># &lt;--- [可微调] 断点续训文件路径 (.pth)</span>
     <span class="n">NUM_CLASSES</span> <span class="o">=</span> <span class="mi">0</span>                  <span class="c1"># (运行时自动覆盖)</span>
@@ -779,10 +779,6 @@
     <span class="n">WEIGHT_DECAY</span> <span class="o">=</span> <span class="mf">1e-4</span>              <span class="c1"># &lt;--- [可微调] L2正则化系数</span>
     <span class="n">SEED</span> <span class="o">=</span> <span class="mi">42</span>                        <span class="c1"># &lt;--- [可微调] 随机种子</span>
 
-    <span class="c1"># --- 高级技巧 ---</span>
-    <span class="n">USE_AMP</span> <span class="o">=</span> <span class="kc">True</span>                   <span class="c1"># &lt;--- [可微调] 是否开启混合精度 (推荐True)</span>
-    <span class="n">LABEL_SMOOTHING</span> <span class="o">=</span> <span class="mf">0.1</span>            <span class="c1"># &lt;--- [可微调] 标签平滑系数</span>
-
     <span class="c1"># --- 策略选择 ---</span>
     <span class="n">OPTIMIZER_NAME</span> <span class="o">=</span> <span class="s1">&#39;adamw&#39;</span>         <span class="c1"># &lt;--- [可微调] &#39;adamw&#39;, &#39;adam&#39;, &#39;sgd&#39;</span>
     <span class="n">SCHEDULER_NAME</span> <span class="o">=</span> <span class="s1">&#39;plateau&#39;</span>       <span class="c1"># &lt;--- [可微调] &#39;plateau&#39;, &#39;cosine&#39;, &#39;step&#39;</span>
@@ -791,7 +787,7 @@
     <span class="n">DEVICE</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
 
 <span class="c1"># ==========================================</span>
-<span class="c1"># 2. 辅助工具 (日志/随机种子/早停)</span>
+<span class="c1"># 2. 辅助工具</span>
 <span class="c1"># ==========================================</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">setup_logger</span><span class="p">(</span><span class="n">save_dir</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;配置日志：同时输出到文件和控制台&quot;&quot;&quot;</span>
@@ -906,34 +902,28 @@
     <span class="n">Config</span><span class="o">.</span><span class="n">NUM_CLASSES</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">class_names</span><span class="p">)</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[Data] 类别数: </span><span class="si">{</span><span class="n">Config</span><span class="o">.</span><span class="n">NUM_CLASSES</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="c1"># num_workers可根据CPU核心数微调</span>
-    <span class="n">train_dl</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">train_ds</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">pin_memory</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">val_dl</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">val_ds</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">pin_memory</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">test_dl</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">test_ds</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">pin_memory</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">if</span> <span class="n">test_ds</span> <span class="k">else</span> <span class="kc">None</span>
+    <span class="n">train_dl</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">train_ds</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">val_dl</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">val_ds</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">test_dl</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">test_ds</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="k">if</span> <span class="n">test_ds</span> <span class="k">else</span> <span class="kc">None</span>
 
     <span class="k">return</span> <span class="n">train_dl</span><span class="p">,</span> <span class="n">val_dl</span><span class="p">,</span> <span class="n">test_dl</span><span class="p">,</span> <span class="n">class_names</span><span class="p">,</span> <span class="n">ds_name</span>
 
 <span class="c1"># ==========================================</span>
 <span class="c1"># 4. 训练与验证核心</span>
 <span class="c1"># ==========================================</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">train_one_epoch</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">loader</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">scaler</span><span class="p">,</span> <span class="n">epoch</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_one_epoch</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">loader</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">epoch</span><span class="p">):</span>
     <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
     <span class="n">total_loss</span><span class="p">,</span> <span class="n">total_correct</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mi">0</span>
     <span class="n">bar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">loader</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Epoch </span><span class="si">{</span><span class="n">epoch</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">Config</span><span class="o">.</span><span class="n">EPOCHS</span><span class="si">}</span><span class="s2"> [Train]&quot;</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">imgs</span><span class="p">,</span> <span class="n">labels</span> <span class="ow">in</span> <span class="n">bar</span><span class="p">:</span>
         <span class="n">imgs</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">imgs</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">DEVICE</span><span class="p">),</span> <span class="n">labels</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">DEVICE</span><span class="p">)</span>
+
         <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-
-        <span class="c1"># AMP 混合精度前向传播</span>
-        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">amp</span><span class="o">.</span><span class="n">autocast</span><span class="p">(</span><span class="n">enabled</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">USE_AMP</span><span class="p">):</span>
-            <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">imgs</span><span class="p">)</span>
-            <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
-
-        <span class="c1"># AMP 反向传播</span>
-        <span class="n">scaler</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-        <span class="n">scaler</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">optimizer</span><span class="p">)</span>
-        <span class="n">scaler</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">imgs</span><span class="p">)</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
 
         <span class="n">total_loss</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="o">*</span> <span class="n">imgs</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">total_correct</span> <span class="o">+=</span> <span class="p">(</span><span class="n">outputs</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="n">labels</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
@@ -949,9 +939,8 @@
 
     <span class="k">for</span> <span class="n">imgs</span><span class="p">,</span> <span class="n">labels</span> <span class="ow">in</span> <span class="n">bar</span><span class="p">:</span>
         <span class="n">imgs</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">imgs</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">DEVICE</span><span class="p">),</span> <span class="n">labels</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">DEVICE</span><span class="p">)</span>
-        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">amp</span><span class="o">.</span><span class="n">autocast</span><span class="p">(</span><span class="n">enabled</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">USE_AMP</span><span class="p">):</span>
-            <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">imgs</span><span class="p">)</span>
-            <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">imgs</span><span class="p">)</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
 
         <span class="n">total_loss</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="o">*</span> <span class="n">imgs</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">total_correct</span> <span class="o">+=</span> <span class="p">(</span><span class="n">outputs</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="n">labels</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
@@ -969,8 +958,7 @@
     <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
         <span class="k">for</span> <span class="n">imgs</span><span class="p">,</span> <span class="n">labels</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">loader</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Testing&quot;</span><span class="p">):</span>
             <span class="n">imgs</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">imgs</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">DEVICE</span><span class="p">),</span> <span class="n">labels</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">DEVICE</span><span class="p">)</span>
-            <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">amp</span><span class="o">.</span><span class="n">autocast</span><span class="p">(</span><span class="n">enabled</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">USE_AMP</span><span class="p">):</span>
-                <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">imgs</span><span class="p">)</span>
+            <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">imgs</span><span class="p">)</span>
             <span class="n">preds</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">outputs</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
             <span class="n">targets</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">labels</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
 
@@ -1004,10 +992,17 @@
 
     <span class="c1"># 1. 确定保存目录</span>
     <span class="k">if</span> <span class="n">Config</span><span class="o">.</span><span class="n">RESUME_PATH</span><span class="p">:</span>
+        <span class="c1"># 断点续训复用原目录</span>
         <span class="n">Config</span><span class="o">.</span><span class="n">SAVE_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">RESUME_PATH</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="c1"># 此时还未加载数据，暂用时间戳命名，后续日志会记录dataset名</span>
-        <span class="n">run_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Config</span><span class="o">.</span><span class="n">MODEL_NAME</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">_%H%M%S&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="c1"># 获取数据集名称用于命名</span>
+        <span class="k">if</span> <span class="n">Config</span><span class="o">.</span><span class="n">USE_CUSTOM_DATASET</span><span class="p">:</span>
+            <span class="n">ds_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">CUSTOM_DATA_ROOT</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ds_name</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">BUILTIN_NAME</span>
+
+        <span class="c1"># 格式: 模型名_数据集名_时间戳</span>
+        <span class="n">run_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Config</span><span class="o">.</span><span class="n">MODEL_NAME</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">ds_name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">_%H%M%S&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="n">Config</span><span class="o">.</span><span class="n">SAVE_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">SAVE_DIR_ROOT</span><span class="p">,</span> <span class="n">run_name</span><span class="p">)</span>
         <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">SAVE_DIR</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
@@ -1033,14 +1028,13 @@
     <span class="n">model</span><span class="o">.</span><span class="n">reset_classifier</span><span class="p">(</span><span class="n">num_classes</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">NUM_CLASSES</span><span class="p">)</span>
     <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">DEVICE</span><span class="p">)</span>
 
-    <span class="c1"># 4. 优化器/调度器/Loss/Scaler</span>
+    <span class="c1"># 4. 优化器/调度器/Loss</span>
     <span class="n">optimizer</span> <span class="o">=</span> <span class="n">get_optimizer</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
     <span class="n">scheduler</span> <span class="o">=</span> <span class="n">get_scheduler</span><span class="p">(</span><span class="n">optimizer</span><span class="p">)</span>
-    <span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">(</span><span class="n">label_smoothing</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">LABEL_SMOOTHING</span><span class="p">)</span>
-    <span class="n">scaler</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">amp</span><span class="o">.</span><span class="n">GradScaler</span><span class="p">(</span><span class="n">enabled</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">USE_AMP</span><span class="p">)</span>
+    <span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">()</span>
     <span class="n">early_stop</span> <span class="o">=</span> <span class="n">EarlyStopping</span><span class="p">(</span><span class="n">patience</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">EARLY_STOP_PATIENCE</span><span class="p">)</span> <span class="k">if</span> <span class="n">Config</span><span class="o">.</span><span class="n">EARLY_STOP_PATIENCE</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>
 
-    <span class="c1"># 5. 断点恢复</span>
+    <span class="c1"># 5. 断点恢复逻辑</span>
     <span class="n">start_epoch</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">best_acc</span> <span class="o">=</span> <span class="mf">0.0</span>
     <span class="n">history</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;train_loss&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;train_acc&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;val_loss&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;val_acc&#39;</span><span class="p">:</span> <span class="p">[]}</span>
@@ -1051,7 +1045,7 @@
         <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">ckpt</span><span class="p">[</span><span class="s1">&#39;state_dict&#39;</span><span class="p">])</span>
         <span class="n">optimizer</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">ckpt</span><span class="p">[</span><span class="s1">&#39;optimizer&#39;</span><span class="p">])</span>
         <span class="k">if</span> <span class="n">scheduler</span> <span class="ow">and</span> <span class="s1">&#39;scheduler&#39;</span> <span class="ow">in</span> <span class="n">ckpt</span><span class="p">:</span> <span class="n">scheduler</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">ckpt</span><span class="p">[</span><span class="s1">&#39;scheduler&#39;</span><span class="p">])</span>
-        <span class="k">if</span> <span class="s1">&#39;scaler&#39;</span> <span class="ow">in</span> <span class="n">ckpt</span><span class="p">:</span> <span class="n">scaler</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">ckpt</span><span class="p">[</span><span class="s1">&#39;scaler&#39;</span><span class="p">])</span>
+
         <span class="n">start_epoch</span> <span class="o">=</span> <span class="n">ckpt</span><span class="p">[</span><span class="s1">&#39;epoch&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="n">best_acc</span> <span class="o">=</span> <span class="n">ckpt</span><span class="p">[</span><span class="s1">&#39;best_acc&#39;</span><span class="p">]</span>
         <span class="n">history</span> <span class="o">=</span> <span class="n">ckpt</span><span class="p">[</span><span class="s1">&#39;history&#39;</span><span class="p">]</span>
@@ -1060,7 +1054,7 @@
     <span class="c1"># 6. 训练循环</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;[Start] 开始训练...&quot;</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">start_epoch</span><span class="p">,</span> <span class="n">Config</span><span class="o">.</span><span class="n">EPOCHS</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
-        <span class="n">t_loss</span><span class="p">,</span> <span class="n">t_acc</span> <span class="o">=</span> <span class="n">train_one_epoch</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">train_dl</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">scaler</span><span class="p">,</span> <span class="n">epoch</span><span class="p">)</span>
+        <span class="n">t_loss</span><span class="p">,</span> <span class="n">t_acc</span> <span class="o">=</span> <span class="n">train_one_epoch</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">train_dl</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">epoch</span><span class="p">)</span>
         <span class="n">v_loss</span><span class="p">,</span> <span class="n">v_acc</span> <span class="o">=</span> <span class="n">validate</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">val_dl</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">epoch</span><span class="p">)</span>
 
         <span class="n">history</span><span class="p">[</span><span class="s1">&#39;train_loss&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t_loss</span><span class="p">);</span> <span class="n">history</span><span class="p">[</span><span class="s1">&#39;train_acc&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t_acc</span><span class="p">)</span>
@@ -1068,25 +1062,28 @@
 
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Epoch </span><span class="si">{</span><span class="n">epoch</span><span class="si">}</span><span class="s2">: Train Acc: </span><span class="si">{</span><span class="n">t_acc</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> | Val Acc: </span><span class="si">{</span><span class="n">v_acc</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> | Loss: </span><span class="si">{</span><span class="n">t_loss</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
+        <span class="c1"># 学习率更新</span>
         <span class="k">if</span> <span class="n">scheduler</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">Config</span><span class="o">.</span><span class="n">SCHEDULER_NAME</span> <span class="o">==</span> <span class="s1">&#39;plateau&#39;</span><span class="p">:</span> <span class="n">scheduler</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">v_acc</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span> <span class="n">scheduler</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
 
+        <span class="c1"># 保存最佳模型</span>
         <span class="n">is_best</span> <span class="o">=</span> <span class="n">v_acc</span> <span class="o">&gt;</span> <span class="n">best_acc</span>
         <span class="k">if</span> <span class="n">is_best</span><span class="p">:</span>
             <span class="n">best_acc</span> <span class="o">=</span> <span class="n">v_acc</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; -&gt; 🌟 新的最佳模型 (Acc: </span><span class="si">{</span><span class="n">best_acc</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
 
+        <span class="c1"># 保存断点</span>
         <span class="n">save_checkpoint</span><span class="p">({</span>
             <span class="s1">&#39;epoch&#39;</span><span class="p">:</span> <span class="n">epoch</span><span class="p">,</span>
             <span class="s1">&#39;state_dict&#39;</span><span class="p">:</span> <span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span>
             <span class="s1">&#39;best_acc&#39;</span><span class="p">:</span> <span class="n">best_acc</span><span class="p">,</span>
             <span class="s1">&#39;optimizer&#39;</span><span class="p">:</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span>
             <span class="s1">&#39;scheduler&#39;</span><span class="p">:</span> <span class="n">scheduler</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span> <span class="k">if</span> <span class="n">scheduler</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="s1">&#39;scaler&#39;</span><span class="p">:</span> <span class="n">scaler</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span>
             <span class="s1">&#39;history&#39;</span><span class="p">:</span> <span class="n">history</span>
         <span class="p">},</span> <span class="n">is_best</span><span class="p">)</span>
 
+        <span class="c1"># 早停检测</span>
         <span class="k">if</span> <span class="n">early_stop</span><span class="p">:</span>
             <span class="n">early_stop</span><span class="p">(</span><span class="n">v_acc</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">early_stop</span><span class="o">.</span><span class="n">early_stop</span><span class="p">:</span>
