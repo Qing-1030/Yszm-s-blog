@@ -51,6 +51,7 @@ nav:
           - 图像分类: cv/Image_Classification.md
           - 检验模型: cv/Predict_img.md
           - 策略: strategy.md
+          - 对比性能: cv/Compare_model.md
           - 实战:
               - resnet18_CIFAR10: cv/exercises/resnet18_CIFAR10.md
               - resnet34_CIFAR100: cv/exercises/resnet34_CIFAR100.md
