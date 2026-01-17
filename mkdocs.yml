@@ -54,3 +54,4 @@ nav:
           - 实战:
               - resnet18_CIFAR10: cv/exercises/resnet18_CIFAR10.md
               - resnet34_CIFAR100: cv/exercises/resnet34_CIFAR100.md
+              - resnet50_Inter_Image_Classification: cv/exercises/resnet50_Inter_Image_Classification.md
