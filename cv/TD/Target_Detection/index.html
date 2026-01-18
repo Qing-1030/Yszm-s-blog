@@ -1,0 +1,1575 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../../IC/exercises/resnet50_Cassava_Leaf_Disease_Classification/">
+      
+      
+        <link rel="next" href="../Predict_img/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>模板 - Yszm's blog</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="purple">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#_1" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../../.." title="Yszm&#39;s blog" class="md-header__button md-logo" aria-label="Yszm's blog" data-md-component="logo">
+      
+  <img src="../../../assets/Logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Yszm's blog
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              模板
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="purple"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="lime"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="标签" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  首页
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../guide/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  博客指南
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../build_blog/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  建站心得
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      
+  
+  
+  
+    
+  
+  
+    
+    
+      
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../IC/Split_datasets/" class="md-tabs__link">
+          
+  
+  
+  个人笔记
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="Yszm&#39;s blog" class="md-nav__button md-logo" aria-label="Yszm's blog" data-md-component="logo">
+      
+  <img src="../../../assets/Logo.png" alt="logo">
+
+    </a>
+    Yszm's blog
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    首页
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    博客指南
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../build_blog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    建站心得
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    个人笔记
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    个人笔记
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4_1" id="__nav_4_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    计算机视觉
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    计算机视觉
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_1_1" id="__nav_4_1_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    图像分类
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_1_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_1_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    图像分类
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../IC/Split_datasets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    数据集划分
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../IC/Image_Classification/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    模板
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../IC/Predict_img/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    检验模型
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../IC/strategy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    策略
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../IC/Compare_model/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    对比性能
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1_1_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_1_1_6" id="__nav_4_1_1_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    实战
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_4_1_1_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_1_1_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    实战
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../IC/exercises/resnet18_CIFAR10/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    resnet18_CIFAR10
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../IC/exercises/resnet34_CIFAR100/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    resnet34_CIFAR100
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../IC/exercises/resnet50_Inter_Image_Classification/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    resnet50_Inter_Image_Classification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../IC/exercises/resnet50_Cassava_Leaf_Disease_Classification/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    resnet50_Cassava_Leaf_Disease_Classification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4_1_2" id="__nav_4_1_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    目标检测
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_1_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4_1_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    目标检测
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    模板
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    模板
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#mmdetection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        一、基于MMDetection
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ultralyticsyolo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        二、基于Ultralytics（YOLO）
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Predict_img/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    检验模型
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../YOLO_test/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    YOLO测试集评估
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#mmdetection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        一、基于MMDetection
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ultralyticsyolo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        二、基于Ultralytics（YOLO）
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="_1">目标检测通用模板</h1>
+<h2 id="mmdetection">一、基于MMDetection</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">mmengine</span><span class="w"> </span><span class="kn">import</span> <span class="n">Config</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mmengine.runner</span><span class="w"> </span><span class="kn">import</span> <span class="n">Runner</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ssl</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">glob</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="c1"># 解决SSL证书问题</span>
+<span class="n">ssl</span><span class="o">.</span><span class="n">_create_default_https_context</span> <span class="o">=</span> <span class="n">ssl</span><span class="o">.</span><span class="n">_create_unverified_context</span>
+
+<span class="c1"># =========================================================</span>
+<span class="c1"># 1. 用户配置区 (USER CONFIGURATION)</span>
+<span class="c1"># =========================================================</span>
+
+<span class="c1"># --- [核心配置] 数据集路径 ---</span>
+<span class="n">DATA_ROOT</span> <span class="o">=</span> <span class="s1">&#39;mask_coco/&#39;</span>  <span class="c1"># 数据集根目录</span>
+<span class="n">CLASSES</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;un_mask&#39;</span><span class="p">,</span> <span class="s1">&#39;mask&#39;</span><span class="p">)</span>  <span class="c1"># 类别名称 (需与标注一致)</span>
+
+<span class="n">TRAIN_ANN</span> <span class="o">=</span> <span class="s1">&#39;annotations/train.json&#39;</span>  <span class="c1"># 训练集标注</span>
+<span class="n">TRAIN_IMG</span> <span class="o">=</span> <span class="s1">&#39;train/&#39;</span>  <span class="c1"># 训练集图片路径</span>
+<span class="n">VAL_ANN</span> <span class="o">=</span> <span class="s1">&#39;annotations/val.json&#39;</span>  <span class="c1"># 验证集标注</span>
+<span class="n">VAL_IMG</span> <span class="o">=</span> <span class="s1">&#39;val/&#39;</span>  <span class="c1"># 验证集图片路径</span>
+<span class="n">TEST_ANN</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># 测试集标注 (可选, None则复用验证集)</span>
+<span class="n">TEST_IMG</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># 测试集图片 (可选)</span>
+
+<span class="c1"># --- [核心配置] 模型基座 ---</span>
+<span class="c1"># 建议：RTMDet (新一代高性能模型) 或 Faster R-CNN (经典稳定)</span>
+<span class="n">BASE_CONFIG</span> <span class="o">=</span> <span class="s1">&#39;configs/faster_rcnn/faster-rcnn_r50_fpn_1x_coco.py&#39;</span>
+<span class="n">PRETRAINED</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># [可调节] 预训练权重路径 (None=自动下载)</span>
+
+<span class="c1"># --- [可调节] 训练超参数 ---</span>
+<span class="n">BATCH_SIZE</span> <span class="o">=</span> <span class="mi">8</span>  <span class="c1"># 批次大小 (显存允许越大越好)</span>
+<span class="n">NUM_EPOCHS</span> <span class="o">=</span> <span class="mi">24</span>  <span class="c1"># 总轮数 (建议 12/24/36)</span>
+<span class="n">WORK_DIR</span> <span class="o">=</span> <span class="s1">&#39;./work_dirs/mask_v2&#39;</span>  <span class="c1"># 结果输出目录</span>
+<span class="n">IMAGE_SCALE</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1333</span><span class="p">,</span> <span class="mi">800</span><span class="p">)</span>  <span class="c1"># 输入尺寸 (W, H)</span>
+
+<span class="c1"># --- [高阶微调] 优化器与调度 ---</span>
+<span class="n">OPTIMIZER</span> <span class="o">=</span> <span class="s1">&#39;AdamW&#39;</span>  <span class="c1"># 选项: &#39;AdamW&#39; (推荐), &#39;SGD&#39;</span>
+<span class="n">INIT_LR</span> <span class="o">=</span> <span class="mf">0.0001</span>  <span class="c1"># 初始学习率 (AdamW: 1e-4, SGD: 0.02)</span>
+<span class="n">SCHEDULER</span> <span class="o">=</span> <span class="s1">&#39;Cosine&#39;</span>  <span class="c1"># 选项: &#39;Cosine&#39; (平滑), &#39;Step&#39; (阶梯)</span>
+
+<span class="c1"># --- [高阶微调] 数据增强开关 ---</span>
+<span class="n">ENABLE_AUG</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># 是否开启增强 (颜色抖动/多尺度)</span>
+
+
+<span class="c1"># =========================================================</span>
+<span class="c1"># 2. 工具函数：自动绘制训练曲线</span>
+<span class="c1"># =========================================================</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_logs</span><span class="p">(</span><span class="n">work_dir</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;读取最新JSON日志并绘制Loss/mAP曲线&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">json_files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">work_dir</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="s1">&#39;vis_data&#39;</span><span class="p">,</span> <span class="s1">&#39;*.json&#39;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">json_files</span><span class="p">:</span> <span class="k">return</span>
+        <span class="n">latest_log</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">json_files</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getmtime</span><span class="p">)</span>
+
+        <span class="n">losses</span><span class="p">,</span> <span class="n">mAPs</span><span class="p">,</span> <span class="n">iters</span><span class="p">,</span> <span class="n">epochs</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">latest_log</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">log</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="k">if</span> <span class="s1">&#39;loss&#39;</span> <span class="ow">in</span> <span class="n">log</span><span class="p">:</span>
+                    <span class="n">losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">log</span><span class="p">[</span><span class="s1">&#39;loss&#39;</span><span class="p">])</span>
+                    <span class="n">iters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">log</span><span class="p">[</span><span class="s1">&#39;step&#39;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="s1">&#39;coco/bbox_mAP&#39;</span> <span class="ow">in</span> <span class="n">log</span><span class="p">:</span>
+                    <span class="n">mAPs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">log</span><span class="p">[</span><span class="s1">&#39;coco/bbox_mAP&#39;</span><span class="p">])</span>
+                    <span class="n">epochs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;epoch&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">mAPs</span><span class="p">)))</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">iters</span><span class="p">,</span> <span class="n">losses</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Train Loss&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Loss Curve&#39;</span><span class="p">);</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mAPs</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">epochs</span><span class="p">,</span> <span class="n">mAPs</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;mAP&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;orange&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Max mAP: </span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">mAPs</span><span class="p">)</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">);</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">work_dir</span><span class="p">,</span> <span class="s1">&#39;training_result.png&#39;</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✅ 训练曲线已保存: </span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">work_dir</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;training_result.png&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;⚠️ 绘图失败: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="c1"># =========================================================</span>
+<span class="c1"># 3. 核心配置构建逻辑</span>
+<span class="c1"># =========================================================</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;🚀 Loading Base Config: </span><span class="si">{</span><span class="n">BASE_CONFIG</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">cfg</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">BASE_CONFIG</span><span class="p">)</span>
+
+<span class="c1"># --- 全局环境配置 ---</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">data_root</span> <span class="o">=</span> <span class="n">DATA_ROOT</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">work_dir</span> <span class="o">=</span> <span class="n">WORK_DIR</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">metainfo</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">classes</span><span class="o">=</span><span class="n">CLASSES</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="p">[(</span><span class="mi">220</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">60</span><span class="p">)]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">CLASSES</span><span class="p">))</span>
+
+<span class="c1"># --- [重点] 增强型数据管道 (Augmentation Pipeline) ---</span>
+<span class="c1"># 1. 基础管道</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;LoadImageFromFile&#39;</span><span class="p">),</span>
+    <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;LoadAnnotations&#39;</span><span class="p">,</span> <span class="n">with_bbox</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+<span class="p">]</span>
+
+<span class="c1"># 2. 注入增强策略</span>
+<span class="k">if</span> <span class="n">ENABLE_AUG</span><span class="p">:</span>
+    <span class="n">pipeline</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span>
+        <span class="c1"># [增强] 光度畸变: 随机调整亮度、对比度、饱和度、色相</span>
+        <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;PhotoMetricDistortion&#39;</span><span class="p">),</span>
+        <span class="c1"># [增强] 多尺度训练: 尺寸在 (W*0.8, H*0.8) 到 (W, H) 之间浮动</span>
+        <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;RandomResize&#39;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">IMAGE_SCALE</span><span class="p">,</span> <span class="n">ratio_range</span><span class="o">=</span><span class="p">(</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span> <span class="n">keep_ratio</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+        <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;RandomFlip&#39;</span><span class="p">,</span> <span class="n">prob</span><span class="o">=</span><span class="mf">0.5</span><span class="p">),</span>
+    <span class="p">])</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="c1"># 仅做基础Resize</span>
+    <span class="n">pipeline</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span>
+        <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;Resize&#39;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">IMAGE_SCALE</span><span class="p">,</span> <span class="n">keep_ratio</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+        <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;RandomFlip&#39;</span><span class="p">,</span> <span class="n">prob</span><span class="o">=</span><span class="mf">0.5</span><span class="p">),</span>
+    <span class="p">])</span>
+
+<span class="c1"># 3. 打包数据</span>
+<span class="n">pipeline</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;PackDetInputs&#39;</span><span class="p">))</span>
+
+<span class="c1"># --- 数据加载器 (DataLoader) ---</span>
+<span class="c1"># 训练集</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">train_dataloader</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">BATCH_SIZE</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">train_dataloader</span><span class="o">.</span><span class="n">num_workers</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># [可调节] Windows设0/2, Linux设4/8</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">train_dataloader</span><span class="o">.</span><span class="n">persistent_workers</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># [可调节] Windows必须False</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">train_dataloader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;CocoDataset&#39;</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">train_dataloader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">data_root</span> <span class="o">=</span> <span class="n">DATA_ROOT</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">train_dataloader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">ann_file</span> <span class="o">=</span> <span class="n">TRAIN_ANN</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">train_dataloader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">data_prefix</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">img</span><span class="o">=</span><span class="n">TRAIN_IMG</span><span class="p">)</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">train_dataloader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">metainfo</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">metainfo</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">train_dataloader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">pipeline</span>  <span class="c1"># 应用增强管道</span>
+
+<span class="c1"># 验证集 pipeline (不做增强，只做Resize)</span>
+<span class="n">test_pipeline</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;LoadImageFromFile&#39;</span><span class="p">),</span>
+    <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;Resize&#39;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">IMAGE_SCALE</span><span class="p">,</span> <span class="n">keep_ratio</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+    <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;LoadAnnotations&#39;</span><span class="p">,</span> <span class="n">with_bbox</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+    <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;PackDetInputs&#39;</span><span class="p">)</span>
+<span class="p">]</span>
+
+<span class="c1"># 验证集</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">val_dataloader</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">val_dataloader</span><span class="o">.</span><span class="n">num_workers</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">val_dataloader</span><span class="o">.</span><span class="n">persistent_workers</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">val_dataloader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;CocoDataset&#39;</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">val_dataloader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">data_root</span> <span class="o">=</span> <span class="n">DATA_ROOT</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">val_dataloader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">ann_file</span> <span class="o">=</span> <span class="n">VAL_ANN</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">val_dataloader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">data_prefix</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">img</span><span class="o">=</span><span class="n">VAL_IMG</span><span class="p">)</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">val_dataloader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">metainfo</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">metainfo</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">val_dataloader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">test_pipeline</span>
+
+<span class="n">cfg</span><span class="o">.</span><span class="n">val_evaluator</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+    <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;CocoMetric&#39;</span><span class="p">,</span>
+    <span class="n">ann_file</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DATA_ROOT</span><span class="p">,</span> <span class="n">VAL_ANN</span><span class="p">),</span>
+    <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;bbox&#39;</span>
+<span class="p">)</span>
+
+<span class="c1"># --- 智能测试集逻辑 ---</span>
+<span class="k">if</span> <span class="n">TEST_ANN</span> <span class="ow">and</span> <span class="n">TEST_IMG</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DATA_ROOT</span><span class="p">,</span> <span class="n">TEST_ANN</span><span class="p">)):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✅ 检测到测试集，将在训练后进行独立测试。&quot;</span><span class="p">)</span>
+    <span class="n">cfg</span><span class="o">.</span><span class="n">test_dataloader</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">val_dataloader</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">cfg</span><span class="o">.</span><span class="n">test_dataloader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">ann_file</span> <span class="o">=</span> <span class="n">TEST_ANN</span>
+    <span class="n">cfg</span><span class="o">.</span><span class="n">test_dataloader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">data_prefix</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">img</span><span class="o">=</span><span class="n">TEST_IMG</span><span class="p">)</span>
+    <span class="n">cfg</span><span class="o">.</span><span class="n">test_evaluator</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">val_evaluator</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">cfg</span><span class="o">.</span><span class="n">test_evaluator</span><span class="o">.</span><span class="n">ann_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DATA_ROOT</span><span class="p">,</span> <span class="n">TEST_ANN</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ℹ️ 未检测到测试集，将复用验证集。&quot;</span><span class="p">)</span>
+    <span class="n">cfg</span><span class="o">.</span><span class="n">test_dataloader</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">val_dataloader</span>
+    <span class="n">cfg</span><span class="o">.</span><span class="n">test_evaluator</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">val_evaluator</span>
+
+<span class="c1"># --- 模型类别自适应 ---</span>
+<span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="s1">&#39;roi_head&#39;</span><span class="p">):</span>
+    <span class="n">cfg</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">roi_head</span><span class="o">.</span><span class="n">bbox_head</span><span class="o">.</span><span class="n">num_classes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">CLASSES</span><span class="p">)</span>
+<span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="s1">&#39;bbox_head&#39;</span><span class="p">):</span>
+    <span class="n">cfg</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">bbox_head</span><span class="o">.</span><span class="n">num_classes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">CLASSES</span><span class="p">)</span>
+
+<span class="c1"># --- 优化器配置 (AdamW/SGD) ---</span>
+<span class="k">if</span> <span class="n">OPTIMIZER</span> <span class="o">==</span> <span class="s1">&#39;AdamW&#39;</span><span class="p">:</span>
+    <span class="n">cfg</span><span class="o">.</span><span class="n">optim_wrapper</span><span class="o">.</span><span class="n">optimizer</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;AdamW&#39;</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="n">INIT_LR</span><span class="p">,</span> <span class="n">weight_decay</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">cfg</span><span class="o">.</span><span class="n">optim_wrapper</span><span class="o">.</span><span class="n">optimizer</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;SGD&#39;</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="n">INIT_LR</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">weight_decay</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">)</span>
+
+<span class="c1"># --- 学习率调度 (Warmup + Main) ---</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">train_cfg</span><span class="o">.</span><span class="n">max_epochs</span> <span class="o">=</span> <span class="n">NUM_EPOCHS</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">train_cfg</span><span class="o">.</span><span class="n">val_interval</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">NUM_EPOCHS</span> <span class="o">//</span> <span class="mi">10</span><span class="p">)</span>  <span class="c1"># [可调节] 验证频率</span>
+
+<span class="c1"># 热身策略 (前500次迭代)</span>
+<span class="n">warmup</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;LinearLR&#39;</span><span class="p">,</span> <span class="n">start_factor</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">by_epoch</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">begin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+
+<span class="c1"># 主调度策略</span>
+<span class="k">if</span> <span class="n">SCHEDULER</span> <span class="o">==</span> <span class="s1">&#39;Cosine&#39;</span><span class="p">:</span>
+    <span class="n">main_sched</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;CosineAnnealingLR&#39;</span><span class="p">,</span> <span class="n">T_max</span><span class="o">=</span><span class="n">NUM_EPOCHS</span><span class="p">,</span> <span class="n">by_epoch</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">begin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">NUM_EPOCHS</span><span class="p">,</span>
+                      <span class="n">eta_min</span><span class="o">=</span><span class="n">INIT_LR</span> <span class="o">*</span> <span class="mf">0.05</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">main_sched</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;MultiStepLR&#39;</span><span class="p">,</span> <span class="n">milestones</span><span class="o">=</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">NUM_EPOCHS</span> <span class="o">*</span> <span class="mf">0.75</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">NUM_EPOCHS</span> <span class="o">*</span> <span class="mf">0.9</span><span class="p">)],</span> <span class="n">gamma</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+                      <span class="n">by_epoch</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">cfg</span><span class="o">.</span><span class="n">param_scheduler</span> <span class="o">=</span> <span class="p">[</span><span class="n">warmup</span><span class="p">,</span> <span class="n">main_sched</span><span class="p">]</span>
+
+<span class="c1"># --- 钩子与可视化 ---</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">default_hooks</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">interval</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">default_hooks</span><span class="o">.</span><span class="n">checkpoint</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+    <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;CheckpointHook&#39;</span><span class="p">,</span>
+    <span class="n">interval</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">max_keep_ckpts</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>  <span class="c1"># [可调节] 只保留最近2个权重</span>
+    <span class="n">save_best</span><span class="o">=</span><span class="s1">&#39;coco/bbox_mAP&#39;</span><span class="p">,</span>  <span class="c1"># [可调节] 保存mAP最高的</span>
+    <span class="n">rule</span><span class="o">=</span><span class="s1">&#39;greater&#39;</span>
+<span class="p">)</span>
+
+<span class="c1"># 启用 TensorBoard</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">vis_backends</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;LocalVisBackend&#39;</span><span class="p">),</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;TensorboardVisBackend&#39;</span><span class="p">)]</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">visualizer</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;DetLocalVisualizer&#39;</span><span class="p">,</span> <span class="n">vis_backends</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">vis_backends</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;visualizer&#39;</span><span class="p">)</span>
+
+<span class="c1"># --- 运行参数 ---</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">load_from</span> <span class="o">=</span> <span class="n">PRETRAINED</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">resume</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">WORK_DIR</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">WORK_DIR</span><span class="p">,</span> <span class="s1">&#39;final_config.py&#39;</span><span class="p">))</span>  <span class="c1"># 保存完整配置供Debug</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">runner</span> <span class="o">=</span> <span class="n">Runner</span><span class="o">.</span><span class="n">from_cfg</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+    <span class="n">runner</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&gt;&gt;&gt; 开始最终测试...&quot;</span><span class="p">)</span>
+    <span class="n">runner</span><span class="o">.</span><span class="n">test</span><span class="p">()</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&gt;&gt;&gt; 正在绘制曲线...&quot;</span><span class="p">)</span>
+    <span class="n">plot_logs</span><span class="p">(</span><span class="n">WORK_DIR</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="ultralyticsyolo">二、基于Ultralytics（YOLO）</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ultralytics</span><span class="w"> </span><span class="kn">import</span> <span class="n">YOLO</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="c1"># =====================================================</span>
+    <span class="c1"># 1. 基础配置 (必填)</span>
+    <span class="c1"># =====================================================</span>
+    <span class="n">MODEL_NAME</span> <span class="o">=</span> <span class="s1">&#39;yolov8n.pt&#39;</span>  <span class="c1"># 预训练模型 (yolov8n.pt, yolov8s.pt, yolo11n.pt...)</span>
+    <span class="n">DATA_YAML</span> <span class="o">=</span> <span class="s1">&#39;data.yaml&#39;</span>  <span class="c1"># 数据集配置文件路径</span>
+    <span class="n">PROJECT</span> <span class="o">=</span> <span class="s1">&#39;runs/detect&#39;</span>  <span class="c1"># 项目保存根目录</span>
+    <span class="n">NAME</span> <span class="o">=</span> <span class="s1">&#39;exp_001&#39;</span>  <span class="c1"># 本次实验名称</span>
+
+    <span class="c1"># 加载模型</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">YOLO</span><span class="p">(</span><span class="n">MODEL_NAME</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;🚀 开始全参数训练...&quot;</span><span class="p">)</span>
+    <span class="c1"># =====================================================</span>
+    <span class="c1"># 2. 训练参数 (按需取消注释)</span>
+    <span class="c1"># 完整参数文档: https://docs.ultralytics.com/modes/train/</span>
+    <span class="c1"># =====================================================</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">(</span>
+        <span class="c1"># --- [核心参数] (建议始终启用) ---</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">DATA_YAML</span><span class="p">,</span>  <span class="c1"># 数据集配置</span>
+        <span class="n">epochs</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>  <span class="c1"># 训练轮数 (建议 100-300)</span>
+        <span class="n">imgsz</span><span class="o">=</span><span class="mi">640</span><span class="p">,</span>  <span class="c1"># 输入图片尺寸</span>
+        <span class="n">batch</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>  <span class="c1"># 批次大小 (-1 为自动适配 AutoBatch)</span>
+        <span class="n">device</span><span class="o">=</span><span class="s1">&#39;0&#39;</span><span class="p">,</span>  <span class="c1"># 显卡索引 (&#39;0&#39;, &#39;0,1&#39;, &#39;cpu&#39;)</span>
+        <span class="n">workers</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>  <span class="c1"># 数据加载线程数 (Windows 若报错请设为 0)</span>
+        <span class="n">project</span><span class="o">=</span><span class="n">PROJECT</span><span class="p">,</span>  <span class="c1"># 保存根目录</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">NAME</span><span class="p">,</span>  <span class="c1"># 实验保存目录名</span>
+        <span class="n">exist_ok</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># 是否覆盖同名文件夹 (False=自动新建 exp2, exp3...)</span>
+        <span class="n">pretrained</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># 是否加载预训练权重</span>
+        <span class="n">optimizer</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">,</span>  <span class="c1"># 优化器 (&#39;SGD&#39;, &#39;Adam&#39;, &#39;AdamW&#39;, &#39;auto&#39;)</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># 打印详细日志</span>
+        <span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span>  <span class="c1"># 随机种子 (固定以复现结果)</span>
+
+        <span class="c1"># --- [训练控制] (常用) ---</span>
+        <span class="c1"># patience = 50,       # 早停机制: 连续 N 轮不涨分则停止</span>
+        <span class="c1"># save = True,         # 是否保存模型 (True=保存最后和最佳)</span>
+        <span class="c1"># save_period = -1,    # 每隔 N 轮强制保存一次 (-1=关闭)</span>
+        <span class="c1"># resume = False,      # 断点续训 (设为 True 需加载 last.pt)</span>
+        <span class="c1"># amp = True,          # 混合精度训练 (节省显存，推荐开启)</span>
+        <span class="c1"># val = True,          # 训练过程中是否进行验证</span>
+        <span class="c1"># cache = False,       # 是否缓存图片到内存 (加速训练，需大内存)</span>
+
+        <span class="c1"># --- [超参数与学习率] (进阶) ---</span>
+        <span class="c1"># lr0 = 0.01,          # 初始学习率 (SGD=0.01, Adam=0.001)</span>
+        <span class="c1"># lrf = 0.01,          # 最终学习率 (lr0 * lrf)</span>
+        <span class="c1"># momentum = 0.937,    # 动量</span>
+        <span class="c1"># weight_decay = 0.0005, # 权重衰减 (防止过拟合)</span>
+        <span class="c1"># warmup_epochs = 3.0,   # 热身轮数</span>
+        <span class="c1"># cos_lr = False,        # 使用余弦退火学习率 (有助于提升最终精度)</span>
+
+        <span class="c1"># --- [数据增强] (核心提分点 - 0.0~1.0) ---</span>
+        <span class="c1"># mosaic = 1.0,        # 马赛克增强 (拼接4张图, 对小目标极好, 推荐 1.0)</span>
+        <span class="c1"># mixup = 0.0,         # 混合增强 (叠图, 复杂场景可试 0.1)</span>
+        <span class="c1"># hsv_h = 0.015,       # 色调变化 (对颜色敏感的任务如红绿灯，设为 0)</span>
+        <span class="c1"># hsv_s = 0.7,         # 饱和度变化</span>
+        <span class="c1"># hsv_v = 0.4,         # 亮度变化 (光照变化大可调高)</span>
+        <span class="c1"># degrees = 0.0,       # 旋转角度 (+/- deg)</span>
+        <span class="c1"># translate = 0.1,     # 平移</span>
+        <span class="c1"># scale = 0.5,         # 缩放 (+/- gain)</span>
+        <span class="c1"># shear = 0.0,         # 剪切</span>
+        <span class="c1"># perspective = 0.0,   # 透视变换</span>
+        <span class="c1"># flipud = 0.0,        # 上下翻转 (俯拍/显微镜可设 0.5)</span>
+        <span class="c1"># fliplr = 0.5,        # 左右翻转 (区分左右方向的任务设为 0)</span>
+
+        <span class="c1"># --- [特殊策略] ---</span>
+        <span class="c1"># close_mosaic = 10,   # 最后 10 轮关闭 Mosaic (稳定模型分布，提升精度)</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✅ 训练结束&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+<script src="https://giscus.app/client.js"
+        data-repo="Qing-1030/Yszm-s-blog"
+        data-repo-id="R_kgDOQ3LDZw"
+        data-category="General"
+        data-category-id="DIC_kwDOQ3LDZ84C02Xu"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="zh-CN"
+        crossorigin="anonymous"
+        async>
+</script>
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  回到页面顶部
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <meta name="referrer" content="no-referrer-when-downgrade">
+<div class="md-copyright">
+  
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <span id="busuanzi_container_site_pv">本站总访问量 <span id="busuanzi_value_site_pv"></span> 次</span>
+  &nbsp;|&nbsp;
+  <span id="busuanzi_container_site_uv">访客数 <span id="busuanzi_value_site_uv"></span> 人</span>
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["content.code.copy", "navigation.top", "navigation.tabs"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../../javascripts/mathjax.js"></script>
+      
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
