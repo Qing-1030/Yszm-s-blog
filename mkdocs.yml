@@ -47,13 +47,18 @@ nav:
   - 建站心得: build_blog.md
   - 个人笔记:
       - 计算机视觉:
-          - 数据集划分: cv/Split_datasets.md
-          - 图像分类: cv/Image_Classification.md
-          - 检验模型: cv/Predict_img.md
-          - 策略: strategy.md
-          - 对比性能: cv/Compare_model.md
-          - 实战:
-              - resnet18_CIFAR10: cv/exercises/resnet18_CIFAR10.md
-              - resnet34_CIFAR100: cv/exercises/resnet34_CIFAR100.md
-              - resnet50_Inter_Image_Classification: cv/exercises/resnet50_Inter_Image_Classification.md
-              - resnet50_Cassava_Leaf_Disease_Classification: cv/exercises/resnet50_Cassava_Leaf_Disease_Classification.md
+          - 图像分类:
+              - 数据集划分: cv/IC/Split_datasets.md
+              - 模板: cv/IC/Image_Classification.md
+              - 检验模型: cv/IC/Predict_img.md
+              - 策略: cv/IC/strategy.md
+              - 对比性能: cv/IC/Compare_model.md
+              - 实战:
+                  - resnet18_CIFAR10: cv/IC/exercises/resnet18_CIFAR10.md
+                  - resnet34_CIFAR100: cv/IC/exercises/resnet34_CIFAR100.md
+                  - resnet50_Inter_Image_Classification: cv/IC/exercises/resnet50_Inter_Image_Classification.md
+                  - resnet50_Cassava_Leaf_Disease_Classification: cv/IC/exercises/resnet50_Cassava_Leaf_Disease_Classification.md
+          - 目标检测:
+              - 模板: cv/TD/Target_Detection.md
+              - 检验模型: cv/TD/Predict_img.md
+              - YOLO测试集评估: cv/TD/YOLO_test.md
