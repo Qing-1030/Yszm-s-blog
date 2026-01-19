@@ -1313,15 +1313,15 @@
 
 <span class="c1"># --- 数据加载器 (DataLoader) ---</span>
 <span class="c1"># 训练集</span>
-<span class="n">cfg</span><span class="o">.</span><span class="n">train_dataloader</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">BATCH_SIZE</span>
-<span class="n">cfg</span><span class="o">.</span><span class="n">train_dataloader</span><span class="o">.</span><span class="n">num_workers</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># [可调节] Windows设0/2, Linux设4/8</span>
-<span class="n">cfg</span><span class="o">.</span><span class="n">train_dataloader</span><span class="o">.</span><span class="n">persistent_workers</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># [可调节] Windows必须False</span>
-<span class="n">cfg</span><span class="o">.</span><span class="n">train_dataloader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;CocoDataset&#39;</span>
-<span class="n">cfg</span><span class="o">.</span><span class="n">train_dataloader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">data_root</span> <span class="o">=</span> <span class="n">DATA_ROOT</span>
-<span class="n">cfg</span><span class="o">.</span><span class="n">train_dataloader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">ann_file</span> <span class="o">=</span> <span class="n">TRAIN_ANN</span>
-<span class="n">cfg</span><span class="o">.</span><span class="n">train_dataloader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">data_prefix</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">img</span><span class="o">=</span><span class="n">TRAIN_IMG</span><span class="p">)</span>
-<span class="n">cfg</span><span class="o">.</span><span class="n">train_dataloader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">metainfo</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">metainfo</span>
-<span class="n">cfg</span><span class="o">.</span><span class="n">train_dataloader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">pipeline</span>  <span class="c1"># 应用增强管道</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">train_dataloader</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+    <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;CocoDataset&#39;</span><span class="p">,</span>
+    <span class="n">data_root</span><span class="o">=</span><span class="n">DATA_ROOT</span><span class="p">,</span>
+    <span class="n">ann_file</span><span class="o">=</span><span class="n">TRAIN_ANN</span><span class="p">,</span>
+    <span class="n">data_prefix</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">img</span><span class="o">=</span><span class="n">TRAIN_IMG</span><span class="p">),</span>
+    <span class="n">metainfo</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">metainfo</span><span class="p">,</span>
+    <span class="n">pipeline</span><span class="o">=</span><span class="n">pipeline</span><span class="p">,</span>
+    <span class="n">backend_args</span><span class="o">=</span><span class="kc">None</span>
+<span class="p">)</span>
 
 <span class="c1"># 验证集 pipeline (不做增强，只做Resize)</span>
 <span class="n">test_pipeline</span> <span class="o">=</span> <span class="p">[</span>
@@ -1332,15 +1332,16 @@
 <span class="p">]</span>
 
 <span class="c1"># 验证集</span>
-<span class="n">cfg</span><span class="o">.</span><span class="n">val_dataloader</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">cfg</span><span class="o">.</span><span class="n">val_dataloader</span><span class="o">.</span><span class="n">num_workers</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">cfg</span><span class="o">.</span><span class="n">val_dataloader</span><span class="o">.</span><span class="n">persistent_workers</span> <span class="o">=</span> <span class="kc">False</span>
-<span class="n">cfg</span><span class="o">.</span><span class="n">val_dataloader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;CocoDataset&#39;</span>
-<span class="n">cfg</span><span class="o">.</span><span class="n">val_dataloader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">data_root</span> <span class="o">=</span> <span class="n">DATA_ROOT</span>
-<span class="n">cfg</span><span class="o">.</span><span class="n">val_dataloader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">ann_file</span> <span class="o">=</span> <span class="n">VAL_ANN</span>
-<span class="n">cfg</span><span class="o">.</span><span class="n">val_dataloader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">data_prefix</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">img</span><span class="o">=</span><span class="n">VAL_IMG</span><span class="p">)</span>
-<span class="n">cfg</span><span class="o">.</span><span class="n">val_dataloader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">metainfo</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">metainfo</span>
-<span class="n">cfg</span><span class="o">.</span><span class="n">val_dataloader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">test_pipeline</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">val_dataloader</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+    <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;CocoDataset&#39;</span><span class="p">,</span>
+    <span class="n">data_root</span><span class="o">=</span><span class="n">DATA_ROOT</span><span class="p">,</span>
+    <span class="n">ann_file</span><span class="o">=</span><span class="n">VAL_ANN</span><span class="p">,</span>
+    <span class="n">data_prefix</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">img</span><span class="o">=</span><span class="n">VAL_IMG</span><span class="p">),</span>
+    <span class="n">metainfo</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">metainfo</span><span class="p">,</span>
+    <span class="n">pipeline</span><span class="o">=</span><span class="n">test_pipeline</span><span class="p">,</span>
+    <span class="n">test_mode</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">backend_args</span><span class="o">=</span><span class="kc">None</span>
+<span class="p">)</span>
 
 <span class="n">cfg</span><span class="o">.</span><span class="n">val_evaluator</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
     <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;CocoMetric&#39;</span><span class="p">,</span>
