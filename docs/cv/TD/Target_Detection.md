@@ -130,15 +130,15 @@ pipeline.append(dict(type='PackDetInputs'))
 
 # --- 数据加载器 (DataLoader) ---
 # 训练集
-cfg.train_dataloader.batch_size = BATCH_SIZE
-cfg.train_dataloader.num_workers = 2  # [可调节] Windows设0/2, Linux设4/8
-cfg.train_dataloader.persistent_workers = False  # [可调节] Windows必须False
-cfg.train_dataloader.dataset.type = 'CocoDataset'
-cfg.train_dataloader.dataset.data_root = DATA_ROOT
-cfg.train_dataloader.dataset.ann_file = TRAIN_ANN
-cfg.train_dataloader.dataset.data_prefix = dict(img=TRAIN_IMG)
-cfg.train_dataloader.dataset.metainfo = cfg.metainfo
-cfg.train_dataloader.dataset.pipeline = pipeline  # 应用增强管道
+cfg.train_dataloader.dataset = dict(
+    type='CocoDataset',
+    data_root=DATA_ROOT,
+    ann_file=TRAIN_ANN,
+    data_prefix=dict(img=TRAIN_IMG),
+    metainfo=cfg.metainfo,
+    pipeline=pipeline,
+    backend_args=None
+)
 
 # 验证集 pipeline (不做增强，只做Resize)
 test_pipeline = [
@@ -149,15 +149,16 @@ test_pipeline = [
 ]
 
 # 验证集
-cfg.val_dataloader.batch_size = 1
-cfg.val_dataloader.num_workers = 1
-cfg.val_dataloader.persistent_workers = False
-cfg.val_dataloader.dataset.type = 'CocoDataset'
-cfg.val_dataloader.dataset.data_root = DATA_ROOT
-cfg.val_dataloader.dataset.ann_file = VAL_ANN
-cfg.val_dataloader.dataset.data_prefix = dict(img=VAL_IMG)
-cfg.val_dataloader.dataset.metainfo = cfg.metainfo
-cfg.val_dataloader.dataset.pipeline = test_pipeline
+cfg.val_dataloader.dataset = dict(
+    type='CocoDataset',
+    data_root=DATA_ROOT,
+    ann_file=VAL_ANN,
+    data_prefix=dict(img=VAL_IMG),
+    metainfo=cfg.metainfo,
+    pipeline=test_pipeline,
+    test_mode=True,
+    backend_args=None
+)
 
 cfg.val_evaluator = dict(
     type='CocoMetric',
