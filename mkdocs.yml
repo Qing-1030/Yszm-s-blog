@@ -54,11 +54,13 @@ nav:
               - 策略: cv/IC/strategy.md
               - 对比性能: cv/IC/Compare_model.md
               - 实战:
-                  - resnet18_CIFAR10: cv/IC/exercises/resnet18_CIFAR10.md
-                  - resnet34_CIFAR100: cv/IC/exercises/resnet34_CIFAR100.md
-                  - resnet50_Inter_Image_Classification: cv/IC/exercises/resnet50_Inter_Image_Classification.md
-                  - resnet50_Cassava_Leaf_Disease_Classification: cv/IC/exercises/resnet50_Cassava_Leaf_Disease_Classification.md
+                  - ResNet18 CIFAR-10 图像分类: cv/IC/experiment/resnet18_CIFAR10.md
+                  - ResNet34 CIFAR-100 图像分类: cv/IC/experiment/resnet34_CIFAR100.md
+                  - ResNet50 Intel 图像分类: cv/IC/experiment/resnet50_Inter_Image_Classification.md
+                  - ResNet50 木薯叶病害分类: cv/IC/experiment/resnet50_Cassava_Leaf_Disease_Classification.md
           - 目标检测:
               - 模板: cv/TD/Target_Detection.md
               - 检验模型: cv/TD/Predict_img.md
               - YOLO测试集评估: cv/TD/YOLO_test.md
+              - 实战:
+                  - Faster-rcnn balloon 目标检测: cv/TD/experiment/faster-rcnn_r50_fpn_1x_coco_balloon.md
