@@ -9,28 +9,28 @@
       
       
       
-        <link rel="prev" href="../Predict_img/">
+        <link rel="prev" href="../resnet50_Inter_Image_Classification/">
       
       
-        <link rel="next" href="../experiment/faster-rcnn_r50_fpn_1x_coco_balloon/">
+        <link rel="next" href="../../../TD/Target_Detection/">
       
       
         
       
       
-      <link rel="icon" href="../../../assets/images/favicon.png">
+      <link rel="icon" href="../../../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
     
     
       
-        <title>YOLO测试集评估 - Yszm's blog</title>
+        <title>ResNet50 木薯叶病害分类 - Yszm's blog</title>
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -49,7 +49,7 @@
       
     
     
-    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -74,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#yolo" class="md-skip">
+        <a href="#resnet50" class="md-skip">
           跳转至
         </a>
       
@@ -88,9 +88,9 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="页眉">
-    <a href="../../.." title="Yszm&#39;s blog" class="md-header__button md-logo" aria-label="Yszm's blog" data-md-component="logo">
+    <a href="../../../.." title="Yszm&#39;s blog" class="md-header__button md-logo" aria-label="Yszm's blog" data-md-component="logo">
       
-  <img src="../../../assets/Logo.png" alt="logo">
+  <img src="../../../../assets/Logo.png" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -107,7 +107,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              YOLO测试集评估
+              ResNet50 木薯叶病害分类
             
           </span>
         </div>
@@ -206,7 +206,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../.." class="md-tabs__link">
+      <a href="../../../.." class="md-tabs__link">
         
   
   
@@ -225,7 +225,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../../guide/" class="md-tabs__link">
+      <a href="../../../../guide/" class="md-tabs__link">
         
   
   
@@ -244,7 +244,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../../build_blog/" class="md-tabs__link">
+      <a href="../../../../build_blog/" class="md-tabs__link">
         
   
   
@@ -285,7 +285,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../../IC/Split_datasets/" class="md-tabs__link">
+        <a href="../../Split_datasets/" class="md-tabs__link">
           
   
   
@@ -325,9 +325,9 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="导航栏" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../.." title="Yszm&#39;s blog" class="md-nav__button md-logo" aria-label="Yszm's blog" data-md-component="logo">
+    <a href="../../../.." title="Yszm&#39;s blog" class="md-nav__button md-logo" aria-label="Yszm's blog" data-md-component="logo">
       
-  <img src="../../../assets/Logo.png" alt="logo">
+  <img src="../../../../assets/Logo.png" alt="logo">
 
     </a>
     Yszm's blog
@@ -342,7 +342,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../.." class="md-nav__link">
+      <a href="../../../.." class="md-nav__link">
         
   
   
@@ -369,7 +369,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../guide/" class="md-nav__link">
+      <a href="../../../../guide/" class="md-nav__link">
         
   
   
@@ -396,7 +396,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../build_blog/" class="md-nav__link">
+      <a href="../../../../build_blog/" class="md-nav__link">
         
   
   
@@ -527,6 +527,8 @@
                 
   
   
+    
+  
   
   
     
@@ -537,11 +539,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1_1" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1_1" checked>
         
           
           <label class="md-nav__link" for="__nav_4_1_1" id="__nav_4_1_1_label" tabindex="0">
@@ -562,7 +564,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_1_1_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_1_1_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_4_1_1">
             <span class="md-nav__icon md-icon"></span>
             
@@ -580,7 +582,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../IC/Split_datasets/" class="md-nav__link">
+      <a href="../../Split_datasets/" class="md-nav__link">
         
   
   
@@ -608,7 +610,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../IC/Image_Classification/" class="md-nav__link">
+      <a href="../../Image_Classification/" class="md-nav__link">
         
   
   
@@ -636,7 +638,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../IC/Predict_img/" class="md-nav__link">
+      <a href="../../Predict_img/" class="md-nav__link">
         
   
   
@@ -664,7 +666,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../IC/strategy/" class="md-nav__link">
+      <a href="../../strategy/" class="md-nav__link">
         
   
   
@@ -692,7 +694,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../IC/Compare_model/" class="md-nav__link">
+      <a href="../../Compare_model/" class="md-nav__link">
         
   
   
@@ -717,6 +719,8 @@
                 
   
   
+    
+  
   
   
     
@@ -727,11 +731,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1_1_6" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1_1_6" checked>
         
           
           <label class="md-nav__link" for="__nav_4_1_1_6" id="__nav_4_1_1_6_label" tabindex="0">
@@ -752,7 +756,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_4_1_1_6_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_4_1_1_6_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_4_1_1_6">
             <span class="md-nav__icon md-icon"></span>
             
@@ -770,7 +774,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../IC/experiment/resnet18_CIFAR10/" class="md-nav__link">
+      <a href="../resnet18_CIFAR10/" class="md-nav__link">
         
   
   
@@ -798,7 +802,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../IC/experiment/resnet34_CIFAR100/" class="md-nav__link">
+      <a href="../resnet34_CIFAR100/" class="md-nav__link">
         
   
   
@@ -826,7 +830,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../IC/experiment/resnet50_Inter_Image_Classification/" class="md-nav__link">
+      <a href="../resnet50_Inter_Image_Classification/" class="md-nav__link">
         
   
   
@@ -834,158 +838,6 @@
     
   
     ResNet50 Intel 图像分类
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../IC/experiment/resnet50_Cassava_Leaf_Disease_Classification/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    ResNet50 木薯叶病害分类
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1_2" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_4_1_2" id="__nav_4_1_2_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    目标检测
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_1_2_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_4_1_2">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    目标检测
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../Target_Detection/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    模板
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../Predict_img/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    检验模型
   
 
     
@@ -1022,7 +874,7 @@
   <span class="md-ellipsis">
     
   
-    YOLO测试集评估
+    ResNet50 木薯叶病害分类
   
 
     
@@ -1040,7 +892,7 @@
   <span class="md-ellipsis">
     
   
-    YOLO测试集评估
+    ResNet50 木薯叶病害分类
   
 
     
@@ -1066,10 +918,82 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#_1" class="md-nav__link">
+  <a href="#1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        核心代码
+        1. 实验配置
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. 训练过程：起步即巅峰，随后过拟合
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 结果深度剖析：被“大类”统治的准确率
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. 结果深度剖析：被“大类”统治的准确率">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 严重的类别不平衡
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 混淆矩阵说了什么？
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. 总结与改进方向
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. 代码
       
     </span>
   </a>
@@ -1080,6 +1004,156 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_1_2" id="__nav_4_1_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    目标检测
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_1_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_1_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    目标检测
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../TD/Target_Detection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    模板
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../TD/Predict_img/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    检验模型
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../TD/YOLO_test/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    YOLO测试集评估
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1142,7 +1216,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../experiment/faster-rcnn_r50_fpn_1x_coco_balloon/" class="md-nav__link">
+      <a href="../../../TD/experiment/faster-rcnn_r50_fpn_1x_coco_balloon/" class="md-nav__link">
         
   
   
@@ -1221,10 +1295,82 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#_1" class="md-nav__link">
+  <a href="#1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        核心代码
+        1. 实验配置
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. 训练过程：起步即巅峰，随后过拟合
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 结果深度剖析：被“大类”统治的准确率
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. 结果深度剖析：被“大类”统治的准确率">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 严重的类别不平衡
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 混淆矩阵说了什么？
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. 总结与改进方向
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. 代码
       
     </span>
   </a>
@@ -1248,55 +1394,113 @@
 
 
 
-<h1 id="yolo">用于YOLO模型评估的代码</h1>
-<h2 id="_1">核心代码</h2>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">ultralytics</span><span class="w"> </span><span class="kn">import</span> <span class="n">YOLO</span>
+<h1 id="resnet50">ResNet50 木薯叶病害分类</h1>
+<p>在完成了基础图像分类任务后，我将目光投向了更具挑战性的 Kaggle 竞赛数据集——<strong>Cassava Leaf Disease Classification（木薯叶病害分类）</strong>。这是一个典型的细粒度分类任务，且以严重的<strong>类别不平衡</strong>著称。</p>
+<p>本次实验我使用了经典的 <strong>ResNet50</strong> 模型，最终在验证集上达到了 <strong>85.19%</strong> 的准确率。虽然成绩尚可，但通过分析训练日志和混淆矩阵，我发现了许多值得深挖的“隐患”。以下是我的详细复盘。</p>
+<h2 id="1">1. 实验配置</h2>
+<ul>
+<li><strong>模型架构</strong>: ResNet50 (预训练权重: <code>timm/resnet50.a1_in1k</code>)</li>
+<li><strong>数据集</strong>: 5 分类 (CBB, CBSD, CGM, CMD, Healthy)</li>
+<li><strong>优化器</strong>: AdamW</li>
+<li><strong>调度器</strong>: Cosine Annealing (余弦退火)</li>
+<li><strong>早停策略</strong>: Patience = 7 (耐心值 7 轮)</li>
+</ul>
+<h2 id="2">2. 训练过程：起步即巅峰，随后过拟合</h2>
+<p>训练过程非常迅速，ResNet50 展现了强大的特征提取能力，但也很快触碰到了瓶颈。</p>
+<ul>
+<li>
+<p><strong>极速收敛</strong>：
+仅仅在 <strong>Epoch 1</strong>，验证集准确率就达到了 <strong>75.65%</strong> 。这得益于 ImageNet 预训练权重对自然纹理的良好适应性。</p>
+</li>
+<li>
+<p><strong>黄金时刻 (Epoch 7)</strong>：
+模型在 <strong>Epoch 7</strong> 达到了全场最佳性能，验证集准确率 <strong>85.19%</strong>，Loss 降至最低点 <strong>0.3787</strong> 。</p>
+</li>
+<li>
+<p><strong>过拟合的信号</strong>：
+从曲线图中可以明显看到，在 Epoch 7 之后，<strong>蓝色线（训练集准确率）</strong> 一路高歌猛进，最终在 Epoch 14 达到了 <strong>92.29%</strong> ；然而，<strong>橙色线（验证集准确率）</strong> 却开始停滞甚至下滑，最终停留在 <strong>83.60%</strong> 。
+同时，验证集的 Loss 在 Epoch 10 之后开始反弹（从 0.30 涨到 0.54），这是典型的<strong>过拟合 (Overfitting)</strong> 征兆。最终，早停机制在 Epoch 14 触发，终止了训练 。</p>
+</li>
+</ul>
+<p><img alt="训练曲线" src="../resnet50_Cassava_leaf_Diease_Classification_training_curve.png" /></p>
+<h2 id="3">3. 结果深度剖析：被“大类”统治的准确率</h2>
+<p>最终的评估结果定格在 <strong>85.19%</strong> 。乍一看这个分数还不错，但如果我们拆解开来看，就会发现严重的问题。</p>
+<h3 id="31">3.1 严重的类别不平衡</h3>
+<p>查看分类报告 (Classification Report)，我们可以看到样本分布极其不均：</p>
+<ul>
+<li>
+<p><strong>3_CMD (花叶病)</strong>: 样本数高达 <strong>1316 张</strong> 。</p>
+</li>
+<li>
+<p><strong>0_CBB (细菌性枯萎病)</strong>: 样本数仅有 <strong>109 张</strong> 。</p>
+</li>
+<li>
+<p><strong>差距</strong>: 类别 3 的数据量是类别 0 的 <strong>12 倍</strong>！</p>
+</li>
+</ul>
+<h3 id="32">3.2 混淆矩阵说了什么？</h3>
+<p>混淆矩阵直观地展示了这种不平衡带来的后果：</p>
+<ol>
+<li>
+<p><strong>“学霸”类别 (3_CMD)</strong>：
+由于数据量巨大，模型在这个类别上表现极好，Recall 高达 <strong>94.83%</strong> 。混淆矩阵中右下角那个深蓝色的方块 (1248 张正确预测) 就是证明。</p>
+</li>
+<li>
+<p><strong>“学渣”类别 (0_CBB)</strong>：
+由于样本太少，模型根本学不会。109 张图里，只有 <strong>67 张</strong> 预测正确，Recall 仅为 <strong>61.47%</strong> 。大量的 CBB 图片被误判为了 Healthy (24张) 或 CMD (8张)。</p>
+</li>
+<li>
+<p><strong>“和稀泥”现象</strong>：
+观察混淆矩阵的第四列（3_CMD），你会发现其他所有类别都有大量图片被误判为 3_CMD。</p>
+</li>
+<li><strong>2_CGM</strong>: 有 40 张被误判为 CMD。</li>
+<li><strong>4_Healthy</strong>: 有 27 张被误判为 CMD。</li>
+<li><strong>原因</strong>：模型为了刷高总准确率，倾向于将模棱两可的图片直接猜成数量最多的类别（CMD），这是一种投机取巧的策略。</li>
+</ol>
+<p><img alt="混淆矩阵" src="../resnet50_Cassava_leaf_Diease_Classification_confusion_matrix.png" /></p>
+<h2 id="4">4. 总结与改进方向</h2>
+<p>这次实验证明了 ResNet50 在数据量充足的情况下（如类别 3）能达到极高的精度（F1-score 0.94），但在小样本类别上表现惨淡（F1-score 0.62）。<strong>85.19% 的总准确率在一定程度上是靠“猜大类”撑起来的虚高分数。</strong></p>
+<p><strong>接下来的优化清单：</strong></p>
+<ol>
+<li><strong>引入 Class Weights (类别权重)</strong>：在计算 Loss 时，给数量少的类别（如 0_CBB）更高的惩罚权重，强迫模型去关注小样本。</li>
+<li><strong>使用 Mixup 或 CutMix</strong>：这是解决 Cassava 数据集过拟合和提高泛化能力的神器。通过混合图片和标签，让模型不再“死记硬背”。</li>
+<li><strong>尝试 Focal Loss</strong>：降低易分类样本的权重，专注于那些难分类的样本。</li>
+</ol>
+<p>这次训练虽然止步于 85%，但它清晰地暴露了不平衡数据集的痛点，为下一步的进阶优化指明了方向！</p>
+<h2 id="5">5. 代码</h2>
+<p>本次实验基于预先构建的图像分类通用框架进行，此处仅对差异化的微调部分（Fine-tuning）进行说明。</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Config</span><span class="p">:</span>
+    <span class="c1"># --- 数据集路径设置 ---</span>
+    <span class="n">USE_CUSTOM_DATASET</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># [必改] True=使用自定义文件夹, False=使用内置(CIFAR10等)</span>
+    <span class="n">CUSTOM_DATA_ROOT</span> <span class="o">=</span> <span class="s2">&quot;./datasets/Cassava_Leaf_Disease_Classification&quot;</span>  <span class="c1"># [必改] 自定义数据集根目录 (包含 train/val)</span>
+    <span class="n">BUILTIN_NAME</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>  <span class="c1"># [可选] 内置数据集名称 (仅当上面为False时生效)</span>
+    <span class="n">DATA_DOWNLOAD_ROOT</span> <span class="o">=</span> <span class="s2">&quot;./data&quot;</span>  <span class="c1"># [可选] 数据下载缓存路径</span>
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="c1"># =====================================================</span>
-    <span class="c1"># 1. 基础配置</span>
-    <span class="c1"># =====================================================</span>
-    <span class="c1"># 指向训练好的最佳权重文件</span>
-    <span class="n">MODEL_PATH</span> <span class="o">=</span> <span class="s1">&#39;runs/detect/exp_001/weights/best.pt&#39;</span>
-    <span class="n">DATA_YAML</span> <span class="o">=</span> <span class="s1">&#39;data.yaml&#39;</span>
+    <span class="c1"># --- 结果保存设置 ---</span>
+    <span class="n">SAVE_DIR_ROOT</span> <span class="o">=</span> <span class="s2">&quot;./results&quot;</span>  <span class="c1"># [可选] 训练结果保存根目录</span>
+    <span class="n">SAVE_DIR</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>  <span class="c1"># (程序自动生成，无需修改)</span>
 
-    <span class="c1"># 加载模型</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">YOLO</span><span class="p">(</span><span class="n">MODEL_PATH</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;🚀 加载模型: </span><span class="si">{</span><span class="n">MODEL_PATH</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="c1"># --- 模型与训练设置 ---</span>
+    <span class="n">MODEL_NAME</span> <span class="o">=</span> <span class="s2">&quot;resnet50&quot;</span>  <span class="c1"># [可选] 模型名称 (如 resnet50, efficientnet_b0)</span>
+    <span class="n">CHECKPOINT_PATH</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>  <span class="c1"># [可选] 预训练权重路径 (空则下载ImageNet权重)</span>
+    <span class="n">RESUME_PATH</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>  <span class="c1"># [可选] 断点续训的 .pth 文件路径</span>
+    <span class="n">NUM_CLASSES</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># (程序自动识别，无需修改)</span>
 
-    <span class="c1"># =====================================================</span>
-    <span class="c1"># 2. 评估参数 (按需取消注释)</span>
-    <span class="c1"># 完整参数文档: https://docs.ultralytics.com/modes/val/</span>
-    <span class="c1"># =====================================================</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;📊 开始在测试集上评估...&quot;</span><span class="p">)</span>
-    <span class="n">metrics</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">val</span><span class="p">(</span>
-        <span class="c1"># --- [核心参数] ---</span>
-        <span class="n">data</span><span class="o">=</span><span class="n">DATA_YAML</span><span class="p">,</span>  <span class="c1"># 数据配置</span>
-        <span class="n">split</span><span class="o">=</span><span class="s1">&#39;test&#39;</span><span class="p">,</span>  <span class="c1"># 指定评估集合: &#39;val&#39;, &#39;test&#39;, &#39;train&#39;</span>
-        <span class="n">imgsz</span><span class="o">=</span><span class="mi">640</span><span class="p">,</span>  <span class="c1"># 评估尺寸 (需与训练时一致)</span>
-        <span class="n">batch</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>  <span class="c1"># 批次大小</span>
-        <span class="n">device</span><span class="o">=</span><span class="s1">&#39;0&#39;</span><span class="p">,</span>  <span class="c1"># 设备</span>
+    <span class="c1"># --- 超参数设置 ---</span>
+    <span class="n">BATCH_SIZE</span> <span class="o">=</span> <span class="mi">16</span>  <span class="c1"># [微调] 批次大小 (显存不足改小)</span>
+    <span class="n">EPOCHS</span> <span class="o">=</span> <span class="mi">50</span>  <span class="c1"># [微调] 训练轮数</span>
+    <span class="n">LR</span> <span class="o">=</span> <span class="mf">1e-4</span>  <span class="c1"># [微调] 初始学习率 (微调通常用 1e-4 或 1e-5)</span>
+    <span class="n">WEIGHT_DECAY</span> <span class="o">=</span> <span class="mf">1e-4</span>  <span class="c1"># [微调] 正则化系数 (抗过拟合用)</span>
+    <span class="n">SEED</span> <span class="o">=</span> <span class="mi">42</span>  <span class="c1"># [可选] 随机种子 (保证结果可复现)</span>
 
-        <span class="c1"># --- [指标控制] ---</span>
-        <span class="c1"># conf = 0.001,        # 评估置信度阈值 (计算 mAP 时通常设很低，默认 0.001)</span>
-        <span class="c1"># iou = 0.6,           # NMS 阈值 (重叠多少算同一个)</span>
-        <span class="c1"># max_det = 300,       # 每张图最大检测数量</span>
+    <span class="c1"># --- 优化策略 ---</span>
+    <span class="n">OPTIMIZER_NAME</span> <span class="o">=</span> <span class="s1">&#39;adamw&#39;</span>  <span class="c1"># [可选] 优化器: &#39;adamw&#39;, &#39;adam&#39;, &#39;sgd&#39;</span>
+    <span class="n">SCHEDULER_NAME</span> <span class="o">=</span> <span class="s1">&#39;cosine&#39;</span>  <span class="c1"># [可选] 学习率策略: &#39;plateau&#39;(监控), &#39;cosine&#39;(余弦), &#39;step&#39;</span>
 
-        <span class="c1"># --- [输出控制] ---</span>
-        <span class="c1"># save_json = False,   # 是否保存结果为 COCO JSON 格式</span>
-        <span class="c1"># save_hybrid = False, # 保存标签+预测结果 (用于辅助标注)</span>
-        <span class="c1"># plots = True,        # 是否绘制 P-R 曲线、混淆矩阵等图表</span>
+    <span class="c1"># --- 早停 (Early Stopping) ---</span>
+    <span class="n">EARLY_STOP_PATIENCE</span> <span class="o">=</span> <span class="mi">7</span>  <span class="c1"># [可选] 连续多少轮不涨分就停止 (0表示关闭)</span>
 
-        <span class="c1"># --- [性能优化] ---</span>
-        <span class="c1"># half = False,        # 使用半精度 (FP16) 评估 (显存更小，速度更快)</span>
-        <span class="c1"># dnn = False,         # 使用 OpenCV DNN 模块进行 ONNX 推理</span>
-    <span class="p">)</span>
-
-    <span class="c1"># 3. 打印结果</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">30</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mAP@50    : </span><span class="si">{</span><span class="n">metrics</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">map50</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mAP@50-95 : </span><span class="si">{</span><span class="n">metrics</span><span class="o">.</span><span class="n">box</span><span class="o">.</span><span class="n">map</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">30</span><span class="p">)</span>
+    <span class="n">DEVICE</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
 </code></pre></div>
 
 
@@ -1367,12 +1571,12 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["content.code.copy", "navigation.top", "navigation.tabs"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../..", "features": ["content.code.copy", "navigation.top", "navigation.tabs"], "search": "../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
-        <script src="../../../javascripts/mathjax.js"></script>
+        <script src="../../../../javascripts/mathjax.js"></script>
       
         <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
       
